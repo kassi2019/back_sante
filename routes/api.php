@@ -12,6 +12,7 @@ use App\Http\Controllers\ZoneUtilisateurController;
 use App\Http\Controllers\MenageController;
 use App\Http\Controllers\TypePatientController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\VaccinController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -118,3 +119,10 @@ Route::get('/patient', [PatientController::class, 'index'])->middleware('auth:ap
 Route::post('patient', [PatientController::class, 'store'])->middleware('auth:api');
 Route::put('/patient/{id}', [PatientController::class, 'update'])->middleware('auth:api');
 Route::delete('/patient/{id}', [PatientController::class, 'destroy'])->middleware('auth:api');
+
+
+//route  vaccin
+Route::get('/vaccin', [VaccinController::class, 'index'])->middleware('auth:api');
+Route::post('vaccin', [VaccinController::class, 'store'])->middleware('auth:api');
+Route::put('/vaccin/{id}', [VaccinController::class, 'update'])->middleware('auth:api');
+Route::delete('/vaccin/{id}', [VaccinController::class, 'destroy'])->middleware('auth:api');
