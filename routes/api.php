@@ -96,6 +96,7 @@ Route::delete('/supprimerZoneUtilisateur/{id}', [ZoneUtilisateurController::clas
 Route::get('/listeZoneParUtilisateur', [ZoneUtilisateurController::class, 'listeZoneInterventionParUtilisateur'])->middleware('auth:api');//route role module
 Route::get('/zoneParAgent', [ZoneUtilisateurController::class, 'zoneParAgent'])->middleware('auth:api');//route role module
 
+Route::get('/Responsable', [ZoneUtilisateurController::class, 'Responsable'])->middleware('auth:api');//route role module
 
 
 

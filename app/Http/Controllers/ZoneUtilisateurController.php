@@ -135,24 +135,55 @@ WHERE rm.zone_intervention_id=m.id
     public function zoneParAgent()
     {
         $userId = auth()->user()->id;
+        $roleid = auth()->user()->id_roles;
         $data_actuel = array();
-        $res = DB::select("SELECT DISTINCT m.libelle AS libelle_zone,rm.zone_intervention_id,rm.utilisateur_id,rm.id
-FROM tb_zone_utilisateurs rm,
-tb_zone_interventions m
-WHERE rm.zone_intervention_id=m.id and rm.utilisateur_id='$userId'
+        if ($roleid == 7) {
+            $res = DB::select("SELECT DISTINCT m.libelle AS libelle_zone,rm.zone_intervention_id
+            FROM tb_zone_utilisateurs rm,
+            tb_zone_interventions m
+            WHERE rm.zone_intervention_id=m.id
           ;");
-        foreach ($res as $region) {
+            foreach ($res as $region) {
 
-            $q = array(
-                "libelle" => $region->libelle_zone,
-                "zone_intervention_id" => $region->zone_intervention_id,
-                "utilisateur_id" => $region->utilisateur_id,
-                "id" => $region->id,
-            );
+                $q = array(
+                    "libelle" => $region->libelle_zone,
+                    "zone_intervention_id" => $region->zone_intervention_id
 
-            array_push($data_actuel, $q);
+                );
+
+                array_push($data_actuel, $q);
+            }
+
+            return response()->json($data_actuel);
+        } else {
+            $res = DB::select("SELECT DISTINCT m.libelle AS libelle_zone,rm.zone_intervention_id
+                    FROM tb_zone_utilisateurs rm,
+                    tb_zone_interventions m
+                    WHERE rm.zone_intervention_id=m.id and rm.utilisateur_id='$userId'
+          ;");
+            foreach ($res as $region) {
+
+                $q = array(
+                    "libelle" => $region->libelle_zone,
+                    "zone_intervention_id" => $region->zone_intervention_id,
+
+                );
+
+                array_push($data_actuel, $q);
+            }
+
+            return response()->json($data_actuel);
         }
 
-        return response()->json($data_actuel);
+    }
+
+
+
+
+    public function Responsable()
+    {
+
+        $products = $this->ZoneUtilisateurService->listeResponsable();
+        return response()->json($products);
     }
 }

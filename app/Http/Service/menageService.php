@@ -2,6 +2,7 @@
 
 namespace App\Http\Service;
 use App\Models\menage;
+use App\Models\User;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use DB;
@@ -18,13 +19,18 @@ class menageService
 
     public function listemenage()
     {
-        // $userId = auth()->user()->id;
-        // $responsableId = auth()->user()->responsable_id;
-        // $roleId = auth()->user()->id_roles;
-        // $respoid = menage::where('responsable_id', $userId)->get(['responsable_id']);
-        return menage::all();
-
-
+        $roleid = auth()->user()->id_roles;
+        $userId = auth()->user()->id;
+        if ($roleid == 7) {
+            $res = DB::select("SELECT * FROM tb_menages me
+          ;");
+            return $res;
+        } else {
+            $res = DB::select("SELECT * FROM tb_menages me
+        WHERE me.user_id='$userId' OR me.responsable_id='$userId'
+          ;");
+            return $res;
+        }
     }
 
     public function creationmenage(array $data)

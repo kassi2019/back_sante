@@ -138,7 +138,7 @@ class ValidationService
         $validator = Validator::make($data, [
             'nom' => 'required|string',
             'prenoms' => 'required|string',
-            'numero' => 'required|string',
+            // 'numero' => 'required|string',
 
         ], );
         // Si la validation échoue, retourner les erreurs
@@ -158,8 +158,8 @@ class ValidationService
         $validator = Validator::make($data, [
             'nom' => 'required|string',
             'prenoms' => 'required|string',
-            'numero' => 'required|string',
-            'date_naissance' => 'required|string',
+            // 'numero' => 'required|string',
+            // 'date_naissance' => 'required|string',
             // 'type_patient_id' => 'required|string',
             //'chef_famille_id' => 'required|string'
 

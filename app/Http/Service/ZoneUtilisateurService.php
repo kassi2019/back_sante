@@ -51,5 +51,11 @@ class ZoneUtilisateurService
         return ['message' => 'Zone Intervention supprimé avec succès.'];
     }
 
-
+    public function listeResponsable()
+    {
+        $res = DB::select("SELECT distinct responsable_id FROM users us
+        WHERE us.responsable_id IS NOT NULL
+          ;");
+        return $res;
+    }
 }
