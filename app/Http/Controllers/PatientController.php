@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 use App\Http\Service\patientService;
+use App\Models\patient;
+use App\Models\patientVaccin;
+
 use Illuminate\Http\Request;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -23,10 +26,10 @@ class PatientController extends Controller
     }
 
     // Méthode pour créer un Fonction
-    public function store(Request $request)
+    public function store89(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu','chef_famille_id','encours']);
+        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id']);
 
         // Utiliser le service pour créer le Fonction
         $result = $this->patientService->creationpatient($data);
@@ -45,13 +48,53 @@ class PatientController extends Controller
         ], 201); // Code HTTP 201 pour "créé"
     }
 
+    public function store(Request $request)
+    {
+        $userId = auth()->user()->id;
+        $responsableId = auth()->user()->responsable_id;
+        $idetat = 0;
+        $resultat = patient::create([
+            'nom' => $request->nom,
+            'prenoms' => $request->prenoms,
+            'numero' => $request->numero,
+            'sexe' => $request->sexe,
+            'date_naissance' => $request->date_naissance,
+            'encours' => $idetat,
+            'type_patient_id' => $request->type_patient_id,
+            'lieu_naissance' => $request->lieu_naissance,
+            'numero_cni' => $request->numero_cni,
+            'numero_cmu' => $request->numero_cmu,
+            'chef_famille_id' => $request->chef_famille_id,
+            'user_id' => $userId,
+            'responsable_id' => $responsableId,
 
+        ]);
+        if ($resultat) {
+            foreach ($request->DataModule as $value) {
+                $dossierborderau = new patientVaccin();
+                // Check if $value is an array (expected case)
+                if (is_array($value)) {
+                    $dossierborderau->vaccin_id = $value["vaccin_id"];
+                } else {
+                    // Handle the case where $value is an integer (e.g., 1)
+                    $dossierborderau->vaccin_id = $value;  // Directly assign the integer
+                }
+                $dossierborderau->patient_id = $resultat->id;
+                $dossierborderau->user_id = $userId;
+                $dossierborderau->save();
+
+
+            }
+        }
+
+        return response()->json($resultat, 201);
+    }
 
     // Méthode pour modifier un Fonction
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu','chef_famille_id','encours']);
+        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

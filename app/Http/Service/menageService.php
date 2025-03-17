@@ -22,11 +22,11 @@ class menageService
         $roleid = auth()->user()->id_roles;
         $userId = auth()->user()->id;
         if ($roleid == 7) {
-            $res = DB::select("SELECT * FROM tb_menages me
+            $res = DB::select("SELECT me.*,CONCAT(me.nom,' ',me.prenoms) AS nom_chef FROM tb_menages me
           ;");
             return $res;
         } else {
-            $res = DB::select("SELECT * FROM tb_menages me
+            $res = DB::select("SELECT me.*,CONCAT(me.nom,' ',me.prenoms) AS nom_chef FROM tb_menages me
         WHERE me.user_id='$userId' OR me.responsable_id='$userId'
           ;");
             return $res;
