@@ -12,4 +12,3 @@ class roleUtilisateur extends Model
 
     protected $guarded = ['id'];
 }
-

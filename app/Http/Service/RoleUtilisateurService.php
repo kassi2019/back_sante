@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Service;
+use Carbon\Carbon;
 use App\Models\roleUtilisateur;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -34,7 +35,7 @@ class RoleUtilisateurService
 
         // Récupérer l'ID de l'utilisateur connecté
         $userId = auth()->user()->id; // Assurez-vous que l'authentification est bien configurée
-
+        $data['heure_creation'] = Carbon::now();
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Service\ZoneUtilisateurService;
 use App\Models\User;
+use Carbon\Carbon;
 use DB;
 use App\Models\zoneUtilisateurs;
 use Illuminate\Support\Facades\Auth;
@@ -85,6 +86,7 @@ WHERE rm.zone_intervention_id=m.id
 
             $dossierborderau->utilisateur_id = $request->utilisateur_id;
             $dossierborderau->user_id = $userId;
+            $dossierborderau->heure_creation = Carbon::now();
             $dossierborderau->save();
         }
 

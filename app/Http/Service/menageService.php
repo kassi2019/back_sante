@@ -3,6 +3,7 @@
 namespace App\Http\Service;
 use App\Models\menage;
 use App\Models\User;
+use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use DB;
@@ -46,7 +47,7 @@ class menageService
         // Récupérer l'ID de l'utilisateur connecté
         $userId = auth()->user()->id; // Assurez-vous que l'authentification est bien configurée
         $responsableId = auth()->user()->responsable_id;
-
+        $data['heure_creation'] = Carbon::now();
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
         $data['responsable_id'] = $responsableId;

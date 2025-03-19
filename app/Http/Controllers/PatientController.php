@@ -67,6 +67,8 @@ class PatientController extends Controller
             'chef_famille_id' => $request->chef_famille_id,
             'user_id' => $userId,
             'responsable_id' => $responsableId,
+            'zone_intervention_id' => $request->zone_intervention_id,
+
 
         ]);
         if ($resultat) {
@@ -94,7 +96,7 @@ class PatientController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours']);
+        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours','zone_intervention_id']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

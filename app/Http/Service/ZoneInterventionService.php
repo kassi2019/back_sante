@@ -5,6 +5,7 @@ use App\Models\zoneIntervention;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 class ZoneInterventionService
 {
 
@@ -54,7 +55,7 @@ WHERE zu.zone_intervention_id=zi.id AND zu.utilisateur_id=$responsale
 
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
-
+        $data['heure_creation'] = Carbon::now();
         // Si la validation réussit, créer un nouveau nature economique
         $datazoneIntervention = zoneIntervention::create($data);
 

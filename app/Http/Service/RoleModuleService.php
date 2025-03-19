@@ -2,6 +2,7 @@
 
 namespace App\Http\Service;
 use App\Models\roleModule;
+use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +62,7 @@ WHERE rm.id_roles=ro.id
 
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
-
+        $data['heure_creation'] = Carbon::now();
         // Si la validation réussit, créer un nouveau nature economique
         $dataroleModule = roleModule::create($data);
 

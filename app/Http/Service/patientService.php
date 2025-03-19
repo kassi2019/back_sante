@@ -2,8 +2,10 @@
 
 namespace App\Http\Service;
 use App\Models\patient;
+use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use DB;
 class patientService
 {
 
@@ -17,7 +19,31 @@ class patientService
 
     public function listepatient()
     {
-        return patient::all();
+        // return patient::all();
+
+
+        $roleid = auth()->user()->id_roles;
+        $userId = auth()->user()->id;
+        if ($roleid == 7) {
+            $res = DB::select("SELECT
+    pt.*,
+    DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours
+FROM tb_patients pt
+
+
+          ;");
+            return $res;
+        } else {
+            $res = DB::select("
+        SELECT
+    pt.*,
+    DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours
+FROM tb_patients pt
+   WHERE pt.user_id='$userId' OR pt.responsable_id='$userId'
+
+          ;");
+            return $res;
+        }
     }
 
     public function creationpatient(array $data)
@@ -37,8 +63,8 @@ class patientService
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
         $data['responsable_id'] = $reponsableid;
-         $data['encours'] = 0;
-
+        $data['encours'] = 0;
+        $data['heure_creation'] = Carbon::now();
         // Si la validation réussit, créer un nouveau nature economique
         $datapatient = patient::create($data);
 

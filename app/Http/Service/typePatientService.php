@@ -2,6 +2,7 @@
 
 namespace App\Http\Service;
 use App\Models\typePatient;
+use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class typePatientService
@@ -35,7 +36,7 @@ class typePatientService
 
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
-
+        $data['heure_creation'] = Carbon::now();
         // Si la validation réussit, créer un nouveau nature economique
         $datatypePatient = typePatient::create($data);
 
