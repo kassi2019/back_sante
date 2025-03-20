@@ -1,42 +1,36 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Service\zoneInterventionService;
+use App\Http\Service\aireSanitaireService;
 use Illuminate\Http\Request;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-class zoneInterventionController extends Controller
+class AireSanitaireController extends Controller
 {
 
-    protected $zoneInterventionService;
+    protected $aireSanitaireService;
 
     // Injection du ProductService dans le contrôleur
-    public function __construct(zoneInterventionService $serviceFonction)
+    public function __construct(aireSanitaireService $serviceFonction)
     {
-        $this->zoneInterventionService = $serviceFonction;
-    }
-    public function listeDistrict_zi()
-    {
-
-        $products = $this->zoneInterventionService->listeDistrict_ZI();
-        return response()->json($products);
-    }
-    public function listeaireSanitaire_zi()
-    {
-
-        $products = $this->zoneInterventionService->listeAireSanitaire_zi();
-        return response()->json($products);
+        $this->aireSanitaireService = $serviceFonction;
     }
     public function index()
     {
 
-        $products = $this->zoneInterventionService->listezoneInterventions();
+        $products = $this->aireSanitaireService->listeaireSanitaire();
+        return response()->json($products);
+    }
+    public function District()
+    {
+
+        $products = $this->aireSanitaireService->listeDistrict();
         return response()->json($products);
     }
     public function listeZoneResponsable($responsale)
     {
 
-        $products = $this->zoneInterventionService->listezoneResponsable($responsale);
+        $products = $this->aireSanitaireService->listezoneResponsable($responsale);
         return response()->json($products);
     }
 
@@ -44,10 +38,10 @@ class zoneInterventionController extends Controller
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['libelle', 'longitude', 'latitude','aire_sanitaire_id','district_id']);
+        $data = $request->only(['libelle', 'longitude', 'latitude','district_id']);
 
         // Utiliser le service pour créer le Fonction
-        $result = $this->zoneInterventionService->creationzoneInterventions($data);
+        $result = $this->aireSanitaireService->creationaireSanitaire($data);
 
         // Vérifier si la validation a échoué
         if (isset($result['errors'])) {
@@ -58,8 +52,8 @@ class zoneInterventionController extends Controller
 
         // Retourner une réponse avec le Fonction créé
         return response()->json([
-            'message' => 'zoneInterventions créé avec succès.',
-            'zoneInterventions' => $result['zoneInterventions']
+            'message' => 'aire Sanitaire créé avec succès.',
+            'aireSanitaire' => $result['aireSanitaire']
         ], 201); // Code HTTP 201 pour "créé"
     }
 
@@ -69,7 +63,7 @@ class zoneInterventionController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['libelle', 'longitude', 'latitude', 'aire_sanitaire_id', 'district_id']);
+        $data = $request->only(['libelle', 'longitude', 'latitude', 'district_id']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté
@@ -78,13 +72,13 @@ class zoneInterventionController extends Controller
             // Ajouter l'ID de l'utilisateur aux données
             $data['user_id'] = $userId;
 
-            // Utiliser le service zoneInterventionService pour mettre à jour la fonction
-            $result = $this->zoneInterventionService->updatezoneInterventions($id, $data);
+            // Utiliser le service aireSanitaireService pour mettre à jour la fonction
+            $result = $this->aireSanitaireService->updateaireSanitaire($id, $data);
 
             // Retourner la fonction mise à jour
             return response()->json([
-                'message' => 'zoneInterventions mise à jour avec succès.',
-                'zoneInterventions' => $result['zoneInterventions']
+                'message' => 'aire Sanitaire mise à jour avec succès.',
+                'aireSanitaire' => $result['aireSanitaire']
             ], 200); // Code HTTP 200 pour "OK"
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -98,8 +92,8 @@ class zoneInterventionController extends Controller
     public function destroy($id)
     {
         try {
-            // Utiliser le service zoneInterventionService pour supprimer le Fonction
-            $result = $this->zoneInterventionService->deletezoneInterventions($id);
+            // Utiliser le service aireSanitaireService pour supprimer le Fonction
+            $result = $this->aireSanitaireService->deleteaireSanitaire($id);
 
             // Retourner un message de succès
             return response()->json($result, 200); // Code HTTP 200 pour "OK"

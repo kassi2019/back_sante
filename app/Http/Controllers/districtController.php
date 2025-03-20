@@ -1,42 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Service\zoneInterventionService;
+use App\Http\Service\districtService;
 use Illuminate\Http\Request;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-class zoneInterventionController extends Controller
+class districtController extends Controller
 {
 
-    protected $zoneInterventionService;
+    protected $districtService;
 
     // Injection du ProductService dans le contrôleur
-    public function __construct(zoneInterventionService $serviceFonction)
+    public function __construct(districtService $serviceFonction)
     {
-        $this->zoneInterventionService = $serviceFonction;
-    }
-    public function listeDistrict_zi()
-    {
-
-        $products = $this->zoneInterventionService->listeDistrict_ZI();
-        return response()->json($products);
-    }
-    public function listeaireSanitaire_zi()
-    {
-
-        $products = $this->zoneInterventionService->listeAireSanitaire_zi();
-        return response()->json($products);
+        $this->districtService = $serviceFonction;
     }
     public function index()
     {
 
-        $products = $this->zoneInterventionService->listezoneInterventions();
+        $products = $this->districtService->listedistrict();
         return response()->json($products);
     }
     public function listeZoneResponsable($responsale)
     {
 
-        $products = $this->zoneInterventionService->listezoneResponsable($responsale);
+        $products = $this->districtService->listezoneResponsable($responsale);
         return response()->json($products);
     }
 
@@ -44,10 +32,10 @@ class zoneInterventionController extends Controller
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['libelle', 'longitude', 'latitude','aire_sanitaire_id','district_id']);
+        $data = $request->only(['libelle', 'longitude', 'latitude']);
 
         // Utiliser le service pour créer le Fonction
-        $result = $this->zoneInterventionService->creationzoneInterventions($data);
+        $result = $this->districtService->creationdistrict($data);
 
         // Vérifier si la validation a échoué
         if (isset($result['errors'])) {
@@ -58,8 +46,8 @@ class zoneInterventionController extends Controller
 
         // Retourner une réponse avec le Fonction créé
         return response()->json([
-            'message' => 'zoneInterventions créé avec succès.',
-            'zoneInterventions' => $result['zoneInterventions']
+            'message' => 'district créé avec succès.',
+            'district' => $result['district']
         ], 201); // Code HTTP 201 pour "créé"
     }
 
@@ -69,7 +57,7 @@ class zoneInterventionController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['libelle', 'longitude', 'latitude', 'aire_sanitaire_id', 'district_id']);
+        $data = $request->only(['libelle', 'longitude', 'latitude']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté
@@ -78,13 +66,13 @@ class zoneInterventionController extends Controller
             // Ajouter l'ID de l'utilisateur aux données
             $data['user_id'] = $userId;
 
-            // Utiliser le service zoneInterventionService pour mettre à jour la fonction
-            $result = $this->zoneInterventionService->updatezoneInterventions($id, $data);
+            // Utiliser le service districtService pour mettre à jour la fonction
+            $result = $this->districtService->updatedistrict($id, $data);
 
             // Retourner la fonction mise à jour
             return response()->json([
-                'message' => 'zoneInterventions mise à jour avec succès.',
-                'zoneInterventions' => $result['zoneInterventions']
+                'message' => 'district mise à jour avec succès.',
+                'district' => $result['district']
             ], 200); // Code HTTP 200 pour "OK"
         } catch (ModelNotFoundException $e) {
             return response()->json([
@@ -98,8 +86,8 @@ class zoneInterventionController extends Controller
     public function destroy($id)
     {
         try {
-            // Utiliser le service zoneInterventionService pour supprimer le Fonction
-            $result = $this->zoneInterventionService->deletezoneInterventions($id);
+            // Utiliser le service districtService pour supprimer le Fonction
+            $result = $this->districtService->deletedistrict($id);
 
             // Retourner un message de succès
             return response()->json($result, 200); // Code HTTP 200 pour "OK"

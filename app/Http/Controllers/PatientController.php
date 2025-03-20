@@ -68,6 +68,7 @@ class PatientController extends Controller
             'user_id' => $userId,
             'responsable_id' => $responsableId,
             'zone_intervention_id' => $request->zone_intervention_id,
+            'date_debut_grossesse' => $request->date_debut_grossesse
 
 
         ]);
@@ -96,7 +97,7 @@ class PatientController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours','zone_intervention_id']);
+        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours','zone_intervention_id','date_debut_grossesse']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

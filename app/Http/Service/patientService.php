@@ -27,7 +27,8 @@ class patientService
         if ($roleid == 7) {
             $res = DB::select("SELECT
     pt.*,
-    DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours
+    DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours,
+    DATEDIFF(NOW(), pt.date_debut_grossesse) AS dureegrossesse
 FROM tb_patients pt
 
 
@@ -37,7 +38,8 @@ FROM tb_patients pt
             $res = DB::select("
         SELECT
     pt.*,
-    DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours
+    DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours,
+    DATEDIFF(NOW(), pt.date_debut_grossesse) AS dureegrossesse
 FROM tb_patients pt
    WHERE pt.user_id='$userId' OR pt.responsable_id='$userId'
 

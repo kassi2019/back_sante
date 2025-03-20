@@ -6,13 +6,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleUtilisateurController;
 use App\Http\Controllers\RoleModuleController;
 use App\Http\Controllers\ModuleController;
-use App\Http\Controllers\ZoneInterventionController;
+use App\Http\Controllers\districtController;
 use App\Http\Controllers\MedicamentController;
 use App\Http\Controllers\ZoneUtilisateurController;
 use App\Http\Controllers\MenageController;
 use App\Http\Controllers\TypePatientController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\VaccinController;
+use App\Http\Controllers\AireSanitaireController;
+use App\Http\Controllers\zoneInterventionController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -72,13 +74,12 @@ Route::delete('/supprimerRoleModule/{id}', [RoleModuleController::class, 'destro
 Route::get('/listeModuleParRole', [RoleModuleController::class, 'listeModuleParRole'])->middleware('auth:api');//route role module
 
 // route zone intervention
-Route::get('/listeZoneIntervention', [ZoneInterventionController::class, 'index'])->middleware('auth:api');
-Route::post('ajouterZoneIntervention', [ZoneInterventionController::class, 'store'])->middleware('auth:api');
-Route::put('/modifierZoneIntervention/{id}', [ZoneInterventionController::class, 'update'])->middleware('auth:api'); // Modifier un ZoneIntervention
-Route::delete('/supprimerZoneIntervention/{id}', [ZoneInterventionController::class, 'destroy'])->middleware('auth:api'); // Supprimer un RoleUtilisateur
-
-Route::get('/listeZoneResponsable/{id}', [ZoneInterventionController::class, 'listeZoneResponsable'])->middleware('auth:api');
-
+Route::get('/district', [districtController::class, 'index'])->middleware('auth:api');
+Route::post('district', [districtController::class, 'store'])->middleware('auth:api');
+Route::put('/district/{id}', [districtController::class, 'update'])->middleware('auth:api'); // Modifier un distr
+Route::delete('/district/{id}', [districtController::class, 'destroy'])->middleware('auth:api'); // Supprimer un RoleUtilisateur
+// Route::get('/district', [districtController::class, 'index'])->middleware('auth:api');
+Route::get('/listeZoneResponsable/{id}', [districtController::class, 'listeZoneResponsable'])->middleware('auth:api');
 
 // route zone intervention
 Route::get('/listemedicament', [MedicamentController::class, 'index'])->middleware('auth:api');
@@ -127,3 +128,21 @@ Route::get('/vaccin', [VaccinController::class, 'index'])->middleware('auth:api'
 Route::post('vaccin', [VaccinController::class, 'store'])->middleware('auth:api');
 Route::put('/vaccin/{id}', [VaccinController::class, 'update'])->middleware('auth:api');
 Route::delete('/vaccin/{id}', [VaccinController::class, 'destroy'])->middleware('auth:api');
+
+
+
+//route  aire sanitaire
+Route::get('/airesanitaire', [AireSanitaireController::class, 'index'])->middleware('auth:api');
+Route::post('airesanitaire', [AireSanitaireController::class, 'store'])->middleware('auth:api');
+Route::put('/airesanitaire/{id}', [AireSanitaireController::class, 'update'])->middleware('auth:api');
+Route::delete('/airesanitaire/{id}', [AireSanitaireController::class, 'destroy'])->middleware('auth:api');
+Route::get('/districtgroupe', [AireSanitaireController::class, 'District'])->middleware('auth:api');
+
+
+//route  zone intervention
+Route::get('/zoneintervention', [zoneInterventionController::class, 'index'])->middleware('auth:api');
+Route::post('zoneintervention', [zoneInterventionController::class, 'store'])->middleware('auth:api');
+Route::put('/zoneintervention/{id}', [zoneInterventionController::class, 'update'])->middleware('auth:api');
+Route::delete('/zoneintervention/{id}', [zoneInterventionController::class, 'destroy'])->middleware('auth:api');
+Route::get('/listeDistrict_zi', [zoneInterventionController::class, 'listeDistrict_zi'])->middleware('auth:api');
+Route::get('/listeaireSanitaire_zi', [zoneInterventionController::class, 'listeaireSanitaire_zi'])->middleware('auth:api');

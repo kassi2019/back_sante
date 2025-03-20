@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class zoneIntervention extends Model
+class district extends Model
 {
-    protected $table = 'tb_zone_interventions';
+    protected $table = 'tb_districts';
 
     public $timestamps = true;
 
