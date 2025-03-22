@@ -29,7 +29,6 @@ class zoneInterventionController extends Controller
     }
     public function index()
     {
-
         $products = $this->zoneInterventionService->listezoneInterventions();
         return response()->json($products);
     }
@@ -44,7 +43,7 @@ class zoneInterventionController extends Controller
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['libelle', 'longitude', 'latitude','aire_sanitaire_id','district_id']);
+        $data = $request->only(['libelle', 'longitude', 'latitude', 'aire_sanitaire_id', 'district_id']);
 
         // Utiliser le service pour créer le Fonction
         $result = $this->zoneInterventionService->creationzoneInterventions($data);

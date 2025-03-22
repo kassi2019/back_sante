@@ -26,7 +26,7 @@ class MedicamentController extends Controller
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['unite_comptage', 'libelle', 'dosage']);
+        $data = $request->only(['code','unite_comptage', 'libelle', 'dosage']);
 
         // Utiliser le service pour créer le Fonction
         $result = $this->MedicamentService->creationmedicament($data);
@@ -51,7 +51,7 @@ class MedicamentController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['unite_comptage', 'libelle', 'dosage']);
+        $data = $request->only(['code','unite_comptage', 'libelle', 'dosage']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

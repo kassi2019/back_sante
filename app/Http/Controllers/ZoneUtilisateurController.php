@@ -20,20 +20,18 @@ class ZoneUtilisateurController extends Controller
     }
     public function index()
     {
-
         $data_actuel = array();
-        $res = DB::select("SELECT DISTINCT CONCAT(ro.noms,' ',ro.prenoms)  AS nom_utilisateur,ro.id
+        $res = DB::select("SELECT DISTINCT CONCAT(ro.noms,' ',ro.prenoms)  AS nom_utilisateur,ro.id,ro.responsable_id
             FROM tb_zone_utilisateurs rm,
             users ro
             WHERE rm.utilisateur_id=ro.id
-
-
           ;");
         foreach ($res as $region) {
 
             $q = array(
                 "nom_utilisateur" => $region->nom_utilisateur,
                 "utilisateur_id" => $region->id,
+                "responsable_id" => $region->responsable_id,
             );
 
             array_push($data_actuel, $q);
@@ -46,18 +44,23 @@ class ZoneUtilisateurController extends Controller
     {
 
         $data_actuel = array();
-        $res = DB::select("SELECT DISTINCT m.libelle AS libelle_zone,rm.zone_intervention_id,rm.utilisateur_id,rm.id
-FROM tb_zone_utilisateurs rm,
-tb_zone_interventions m
-WHERE rm.zone_intervention_id=m.id
+        $res = DB::select("
+        SELECT DISTINCT m.libelle AS libelle_zone,rm.aire_sanitaire_id,rm.utilisateur_id,rm.id,rm.zone_intervention_id,zinte.libelle AS libelle_zone_intervention
+        FROM tb_zone_utilisateurs rm
+        LEFT JOIN tb_zone_interventions zinte ON zinte.id=rm.zone_intervention_id,
+        tb_aire_sanitaires m
+
+        WHERE rm.aire_sanitaire_id=m.id
           ;");
         foreach ($res as $region) {
 
             $q = array(
                 "libelle" => $region->libelle_zone,
-                "zone_intervention_id" => $region->zone_intervention_id,
+                "aire_sanitaire_id" => $region->aire_sanitaire_id,
                 "utilisateur_id" => $region->utilisateur_id,
                 "id" => $region->id,
+                "zone_intervention_id" => $region->zone_intervention_id,
+                "libelle_zone_intervention" => $region->libelle_zone_intervention
             );
 
             array_push($data_actuel, $q);
@@ -78,13 +81,14 @@ WHERE rm.zone_intervention_id=m.id
 
             // Check if $value is an array (expected case)
             if (is_array($value)) {
-                $dossierborderau->zone_intervention_id = $value["zone_intervention_id"];
+                $dossierborderau->aire_sanitaire_id = $value["aire_sanitaire_id"];
+                //$dossierborderau->zone_intervention_id = $value["zone_intervention_id"];
             } else {
                 // Handle the case where $value is an integer (e.g., 1)
-                $dossierborderau->zone_intervention_id = $value;  // Directly assign the integer
+                $dossierborderau->aire_sanitaire_id = $value;  // Directly assign the integer
             }
-
             $dossierborderau->utilisateur_id = $request->utilisateur_id;
+            $dossierborderau->superviseur_id = $request->superviseur_id;
             $dossierborderau->user_id = $userId;
             $dossierborderau->heure_creation = Carbon::now();
             $dossierborderau->save();
@@ -97,7 +101,7 @@ WHERE rm.zone_intervention_id=m.id
     // Méthode pour modifier un Fonction
     public function update(Request $request, $id)
     {
-        $data = $request->only(['zone_intervention_id', 'utilisateur_id']);
+        $data = $request->only(['zone_intervention_id', 'utilisateur_id','aire_sanitaire_id','superviseur_id']);
         try {
             $userId = auth()->user()->id;
             $data['user_id'] = $userId;
@@ -187,5 +191,53 @@ WHERE rm.zone_intervention_id=m.id
 
         $products = $this->ZoneUtilisateurService->listeResponsable();
         return response()->json($products);
+    }
+
+
+
+    public function listeAireSanitaireParsuperviseur($responsale)
+    {
+
+        $products = $this->ZoneUtilisateurService->AireSanitaireParsuperviseur($responsale);
+        return response()->json($products);
+    }
+
+
+    public function listeZoneInterventParsuperviseur($airesanitaire)
+    {
+
+        $products = $this->ZoneUtilisateurService->zoneInterventionParsup($airesanitaire);
+        return response()->json($products);
+    }
+
+
+
+
+    public function enregistrerzoneParAgent(Request $request)
+    {
+
+
+        // Proceed only if validation passes
+        // $userid = User::where("id", Auth::user()->id)->first();
+        $userId = auth()->user()->id;
+        foreach ($request->DataModule as $value) {
+            $dossierborderau = new zoneUtilisateurs();
+
+            // Check if $value is an array (expected case)
+            if (is_array($value)) {
+                $dossierborderau->zone_intervention_id = $value["zone_intervention_id"];
+
+            } else {
+                // Handle the case where $value is an integer (e.g., 1)
+                $dossierborderau->zone_intervention_id = $value;  // Directly assign the integer
+            }
+            $dossierborderau->utilisateur_id = $request->utilisateur_id;
+            $dossierborderau->aire_sanitaire_id = $request->aire_sanitaire_id;
+            $dossierborderau->superviseur_id = $request->superviseur_id;
+            $dossierborderau->user_id = $userId;
+            $dossierborderau->heure_creation = Carbon::now();
+            $dossierborderau->save();
+        }
+
     }
 }

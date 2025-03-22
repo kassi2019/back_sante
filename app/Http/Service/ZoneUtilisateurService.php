@@ -58,4 +58,32 @@ class ZoneUtilisateurService
           ;");
         return $res;
     }
+
+
+
+
+    public function AireSanitaireParsuperviseur($responsale)
+    {
+
+            $res = DB::select("SELECT zi.libelle AS libelle_aire_Sanitaire,zu.aire_sanitaire_id
+FROM tb_zone_utilisateurs zu,
+tb_aire_sanitaires zi
+WHERE zu.aire_sanitaire_id=zi.id AND zu.utilisateur_id=$responsale
+          ;");
+            return $res;
+
+
+    }
+    public function zoneInterventionParsup($airesanitaire)
+    {
+
+        $res = DB::select("SELECT zi.*
+FROM
+tb_zone_interventions zi
+WHERE   zi.aire_sanitaire_id=$airesanitaire
+          ;");
+        return $res;
+
+
+    }
 }

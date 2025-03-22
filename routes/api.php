@@ -45,6 +45,8 @@ Route::get('listeUtilisateur', [AuthController::class, 'index'])->middleware('au
 Route::put('/modifierUtilisateur/{id}', [AuthController::class, 'update'])->middleware('auth:api'); // Modifier un produit
 Route::delete('/supprimerUtilisateur/{id}', [AuthController::class, 'destroy'])->middleware('auth:api'); // Supprimer un produit
 Route::get('listeModuleUtilisateurConnecter', [AuthController::class, 'listeModuleUtilisateurConnecter'])->middleware('auth:api');
+
+Route::get('listeAgentParsuperviseur/{id}', [AuthController::class, 'listeAgentParsuperviseur'])->middleware('auth:api');
 //route fonction
 
 
@@ -98,6 +100,10 @@ Route::get('/listeZoneParUtilisateur', [ZoneUtilisateurController::class, 'liste
 Route::get('/zoneParAgent', [ZoneUtilisateurController::class, 'zoneParAgent'])->middleware('auth:api');//route role module
 
 Route::get('/Responsable', [ZoneUtilisateurController::class, 'Responsable'])->middleware('auth:api');//route role module
+
+Route::get('/AireSanitaireParsuperviseur/{sup}', [ZoneUtilisateurController::class, 'listeAireSanitaireParsuperviseur'])->middleware('auth:api');//route role module
+Route::get('/listeZoneInterventParsuperviseur/{sup}', [ZoneUtilisateurController::class, 'listeZoneInterventParsuperviseur'])->middleware('auth:api');//route role module
+Route::post('enregistrerzoneParAgent', [ZoneUtilisateurController::class, 'enregistrerzoneParAgent'])->middleware('auth:api');
 
 
 

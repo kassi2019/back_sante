@@ -4,6 +4,7 @@ namespace App\Http\Service;
 use App\Models\User;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 class AuthService
 {
 
@@ -49,6 +50,19 @@ class AuthService
         $datautilisateur->delete();
 
         return ['message' => 'Utilisateur supprimé avec succès.'];
+    }
+
+    public function agentparsuperviseur($respo)
+    {
+
+        $res = DB::select("SELECT CONCAT(zi.noms,'  ',zi.prenoms) nom_prenoms,zi.id
+FROM
+users zi
+WHERE zi.responsable_id=$respo
+          ;");
+        return $res;
+
+
     }
 
 }

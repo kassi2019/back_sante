@@ -26,7 +26,7 @@ class VaccinController extends Controller
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['libelle']);
+        $data = $request->only(['type_patient','libelle']);
 
         // Utiliser le service pour créer le Fonction
         $result = $this->VaccinService->creationvaccin($data);
@@ -51,7 +51,7 @@ class VaccinController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['code', 'libelle']);
+        $data = $request->only(['type_patient', 'libelle']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

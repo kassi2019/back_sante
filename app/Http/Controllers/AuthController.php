@@ -181,4 +181,13 @@ class AuthController extends Controller
 
         return response()->json($data_actuel);
     }
+
+
+
+    public function listeAgentParsuperviseur($respo)
+    {
+
+        $products = $this->AuthService->agentparsuperviseur($respo);
+        return response()->json($products);
+    }
 }
