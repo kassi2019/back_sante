@@ -7,9 +7,11 @@ use App\Http\Service\AuthService;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Carbon\Carbon;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator;
 use DB;
+use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     protected $AuthService;
@@ -21,35 +23,68 @@ class AuthController extends Controller
     }
     public function index()
     {
-
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
         $data_actuel = array();
+        if ($roleId == 7) {
         $res = DB::select("SELECT DISTINCT rm.*, ro.libelle AS libelle_role,
-         CONCAT(us.noms, ' ', us.prenoms) AS nom_responsable
+        CONCAT(rm.noms, ' ', rm.prenoms) AS nom_responsable,ro.code
         FROM users rm
         JOIN tb_roles ro ON rm.id_roles = ro.id
-        LEFT JOIN users us ON us.responsable_id = rm.id
           ;");
-        foreach ($res as $region) {
+            foreach ($res as $region) {
 
-            $q = array(
-                "id" => $region->id,
-                "noms" => $region->noms,
-                "id_roles" => $region->id_roles,
-                "prenoms" => $region->prenoms,
-                "numero" => $region->numero,
-                "libelle_role" => $region->libelle_role,
-                "nom_responsable" => $region->nom_responsable,
-                "responsable_id" => $region->responsable_id,
-            );
+                $q = array(
+                    "id" => $region->id,
+                    "noms" => $region->noms,
+                    "id_roles" => $region->id_roles,
+                    "prenoms" => $region->prenoms,
+                    "numero" => $region->numero,
+                    "libelle_role" => $region->libelle_role,
+                    "nom_responsable" => $region->nom_responsable,
+                    "responsable_id" => $region->responsable_id,
+                    "code_role" => $region->code
+                );
 
-            array_push($data_actuel, $q);
+                array_push($data_actuel, $q);
+            }
+        }else{
+            $res = DB::select("SELECT DISTINCT rm.*, ro.libelle AS libelle_role,
+         CONCAT(rm.noms, ' ', rm.prenoms) AS nom_responsable,ro.code
+        FROM users rm
+        JOIN tb_roles ro ON rm.id_roles = ro.id
+
+        WHERE rm.responsable_id='$userId' OR rm.respo_superieur_id='$userId' OR rm.user_id='$userId'
+
+          ;");
+            foreach ($res as $region) {
+
+                $q = array(
+                    "id" => $region->id,
+                    "noms" => $region->noms,
+                    "id_roles" => $region->id_roles,
+                    "prenoms" => $region->prenoms,
+                    "numero" => $region->numero,
+                    "libelle_role" => $region->libelle_role,
+                    "nom_responsable" => $region->nom_responsable,
+                    "responsable_id" => $region->responsable_id,
+                    "code_role" => $region->code
+                );
+
+                array_push($data_actuel, $q);
+            }
         }
+
 
         return response()->json($data_actuel);
     }
     // Enregistrement d'un utilisateur
     public function register(Request $request)
     {
+        // if (!auth()->check()) {
+        //     return response()->json(['message' => 'Utilisateur non authentifié'], 401);
+        // }
+         $userId = auth()->user()->id;
         // Validation des données
         $validated = $request->validate([
             'noms' => 'required|string|max:255',
@@ -57,7 +92,7 @@ class AuthController extends Controller
             'numero' => 'required|string|unique:users',
             'password' => 'required|string|min:6',
             'id_roles' => 'required|numeric',
-            'responsable_id' => 'required|numeric',
+
         ]);
 
         // Création de l'utilisateur
@@ -68,7 +103,11 @@ class AuthController extends Controller
             'affiche_password' => $validated['password'],
             'password' => bcrypt($validated['password']),
             'id_roles' => $validated['id_roles'],
-            'responsable_id' => $validated['responsable_id']
+            'responsable_id' => $request->responsable_id,
+            'respo_superieur_id' => $request->respo_superieur_id,
+            'heure_creation' => Carbon::now(),
+            'user_id' => $userId
+
         ]);
 
         return response()->json(['message' => 'Utilisateur créé avec succès', 'user' => $user], 201);

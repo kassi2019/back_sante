@@ -51,10 +51,13 @@ class ZoneUtilisateurService
         return ['message' => 'Zone Intervention supprimé avec succès.'];
     }
 
-    public function listeResponsable()
+    public function listeResponsable($role)
     {
-        $res = DB::select("SELECT distinct responsable_id FROM users us
-        WHERE us.responsable_id IS NOT NULL
+        $coderole = $role + 1;
+        $res = DB::select("SELECT DISTINCT us.id AS utilisateur_id,CONCAT(us.noms,' ',us.prenoms) AS nom_utilisateur,rol.code,rol.id AS role_id,rol.libelle AS libelle_role
+FROM users us,
+tb_roles rol
+        WHERE us.id_roles=rol.id AND rol.code='$coderole'
           ;");
         return $res;
     }

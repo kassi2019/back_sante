@@ -26,7 +26,9 @@ class User extends Authenticatable implements JWTSubject
         'affiche_password',
         'id_roles',
         'user_id',
-        'responsable_id'
+        'responsable_id',
+        'respo_superieur_id',
+        'heure_creation'
 
     ];
     // Si tu veux préciser que certaines colonnes n'existent pas (par exemple dans la base de données) :
