@@ -151,4 +151,20 @@ WHERE zu.zone_intervention_id=zi.id AND zu.utilisateur_id=$responsale
         // Si l'utilisateur n'est pas authentifié, retourner une liste vide ou une erreur
         return [];
     }
+
+
+
+
+
+
+    public function listeAireSanitaireParDistrict($responsale)
+    {
+
+            $res = DB::select("SELECT * FROM tb_aire_sanitaires
+WHERE district_id='$responsale'
+          ;");
+            return $res;
+
+
+    }
 }

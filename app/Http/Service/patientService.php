@@ -41,7 +41,7 @@ FROM tb_patients pt
     DATEDIFF(NOW(), pt.date_naissance) AS age_en_jours,
     DATEDIFF(NOW(), pt.date_debut_grossesse) AS dureegrossesse
 FROM tb_patients pt
-   WHERE pt.user_id='$userId' OR pt.responsable_id='$userId'
+   WHERE pt.user_id='$userId' OR pt.responsable_id='$userId' OR resp_sup_id='$userId'
 
           ;");
             return $res;
@@ -62,9 +62,11 @@ FROM tb_patients pt
         $userId = auth()->user()->id; // Assurez-vous que l'authentification est bien configurée
         $reponsableid = auth()->user()->responsable_id;
 
+        $respSupId = auth()->user()->respo_superieur_id;
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
         $data['responsable_id'] = $reponsableid;
+        $data['resp_sup_id'] = $respSupId;
         $data['encours'] = 0;
         $data['heure_creation'] = Carbon::now();
         // Si la validation réussit, créer un nouveau nature economique

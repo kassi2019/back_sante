@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Http\Service\menageService;
 use Illuminate\Http\Request;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class MenageController extends Controller
 {
@@ -51,12 +51,12 @@ class MenageController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['nom', 'prenoms', 'numero', 'longitude', 'latitude', 'zone_intervention_id', 'numero_cni', 'numero_cmu', 'responsable_id']);
+        $data = $request->only(['nom', 'prenoms', 'numero', 'longitude', 'latitude', 'zone_intervention_id', 'numero_cni', 'numero_cmu', 'responsable_id','mouvement']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté
             $userId = auth()->user()->id;
-
+            $data['heure_creation'] = Carbon::now();
             // Ajouter l'ID de l'utilisateur aux données
             $data['user_id'] = $userId;
 

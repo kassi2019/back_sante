@@ -5,6 +5,7 @@ use App\Models\vaccin;
 use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 class VaccinService
 {
 
@@ -15,7 +16,16 @@ class VaccinService
     {
         $this->validationService = $validationService;
     }
+    public function listeVaccinParTypePatient($resp)
+    {
 
+        $res = DB::select("SELECT * FROM tb_aire_sanitaires
+WHERE district_id='$resp'
+          ;");
+        return $res;
+
+
+    }
     public function listevaccin()
     {
         return vaccin::all();

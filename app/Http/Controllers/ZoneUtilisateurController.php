@@ -115,13 +115,14 @@ zinte.libelle AS libelle_zone_intervention,dist.libelle AS libelle_district,rm.*
             // Check if $value is an array (expected case)
             if (is_array($value)) {
                 $dossierborderau->aire_sanitaire_id = $value["aire_sanitaire_id"];
-                //$dossierborderau->zone_intervention_id = $value["zone_intervention_id"];
+
             } else {
-                // Handle the case where $value is an integer (e.g., 1)
+
                 $dossierborderau->aire_sanitaire_id = $value;  // Directly assign the integer
             }
             $dossierborderau->utilisateur_id = $request->utilisateur_id;
             $dossierborderau->superviseur_id = $request->superviseur_id;
+            //$dossierborderau->district_id = $request->district_id;
             $dossierborderau->user_id = $userId;
             $dossierborderau->heure_creation = Carbon::now();
             $dossierborderau->save();

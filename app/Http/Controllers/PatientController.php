@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Service\patientService;
 use App\Models\patient;
 use App\Models\patientVaccin;
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -52,6 +52,7 @@ class PatientController extends Controller
     {
         $userId = auth()->user()->id;
         $responsableId = auth()->user()->responsable_id;
+        $respSupId = auth()->user()->respo_superieur_id;
         $idetat = 0;
         $resultat = patient::create([
             'nom' => $request->nom,
@@ -67,8 +68,11 @@ class PatientController extends Controller
             'chef_famille_id' => $request->chef_famille_id,
             'user_id' => $userId,
             'responsable_id' => $responsableId,
+            'resp_sup_id' => $respSupId,
             'zone_intervention_id' => $request->zone_intervention_id,
-            'date_debut_grossesse' => $request->date_debut_grossesse
+            //'date_debut_grossesse' => $request->date_debut_grossesse,
+            'mere_nouveau_id' => $request->mere_nouveau_id,
+            'heure_creation' => Carbon::now()
 
 
         ]);
@@ -85,9 +89,13 @@ class PatientController extends Controller
                 $dossierborderau->patient_id = $resultat->id;
                 $dossierborderau->user_id = $userId;
                 $dossierborderau->save();
-
-
             }
+
+            $resulta = patient::where('id', $request->mere_nouveau_id)->update([
+                'mouvement' => 1
+
+            ]);
+
         }
 
         return response()->json($resultat, 201);
@@ -97,7 +105,7 @@ class PatientController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'encours', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours','zone_intervention_id','date_debut_grossesse']);
+        $data = $request->only(['nom', 'prenoms', 'numero', 'sexe', 'date_naissance', 'etat', 'type_patient_id', 'lieu_naissance', 'numero_cni', 'numero_cmu', 'chef_famille_id', 'encours', 'zone_intervention_id', 'date_effect','mere_nouveau_id']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté
@@ -105,7 +113,7 @@ class PatientController extends Controller
 
             // Ajouter l'ID de l'utilisateur aux données
             $data['user_id'] = $userId;
-
+            $data['heure_creation'] = Carbon::now();
             // Utiliser le service patientService pour mettre à jour la fonction
             $result = $this->patientService->updatepatient($id, $data);
 

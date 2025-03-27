@@ -28,7 +28,7 @@ class menageService
             return $res;
         } else {
             $res = DB::select("SELECT me.*,CONCAT(me.nom,' ',me.prenoms) AS nom_chef FROM tb_menages me
-        WHERE me.user_id='$userId' OR me.responsable_id='$userId'
+        WHERE me.user_id='$userId' OR me.responsable_id='$userId' OR resp_sup_id='$userId'
           ;");
             return $res;
         }
@@ -47,10 +47,13 @@ class menageService
         // Récupérer l'ID de l'utilisateur connecté
         $userId = auth()->user()->id; // Assurez-vous que l'authentification est bien configurée
         $responsableId = auth()->user()->responsable_id;
+        $respSupId = auth()->user()->respo_superieur_id;
         $data['heure_creation'] = Carbon::now();
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
         $data['responsable_id'] = $responsableId;
+        $data['resp_sup_id'] = $respSupId;
+
         // Si la validation réussit, créer un nouveau nature economique
         $datamenage = menage::create($data);
 

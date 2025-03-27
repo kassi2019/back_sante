@@ -104,4 +104,13 @@ class AireSanitaireController extends Controller
         }
     }
 
+
+
+    public function AireSanitaireParDistrict($responsale)
+    {
+
+        $products = $this->aireSanitaireService->listeAireSanitaireParDistrict($responsale);
+        return response()->json($products);
+    }
+
 }
