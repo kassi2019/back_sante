@@ -171,4 +171,26 @@ class ValidationService
         // Si la validation passe, retourner null (aucune erreur)
         return null;
     }
+
+
+
+
+
+    public function validateInventaireEquipement(array $data, )
+    {
+        // Définition des règles de validation pour le produit
+        $validator = Validator::make($data, [
+            'equipement_id' => 'required|string',
+            'status' => 'required|string',
+            'type_equipement_id' => 'required|string',
+        ], );
+
+        // Si la validation échoue, retourner les erreurs
+        if ($validator->fails()) {
+            return $validator->errors();
+        }
+
+        // Si la validation passe, retourner null (aucune erreur)
+        return null;
+    }
 }

@@ -15,6 +15,9 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\VaccinController;
 use App\Http\Controllers\AireSanitaireController;
 use App\Http\Controllers\zoneInterventionController;
+use App\Http\Controllers\EquipementController;
+use App\Http\Controllers\typeEquipementController;
+use App\Http\Controllers\inventaireEquipementController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -158,3 +161,30 @@ Route::put('/zoneintervention/{id}', [zoneInterventionController::class, 'update
 Route::delete('/zoneintervention/{id}', [zoneInterventionController::class, 'destroy'])->middleware('auth:api');
 Route::get('/listeDistrict_zi', [zoneInterventionController::class, 'listeDistrict_zi'])->middleware('auth:api');
 Route::get('/listeaireSanitaire_zi', [zoneInterventionController::class, 'listeaireSanitaire_zi'])->middleware('auth:api');
+
+
+
+
+//route equipement
+Route::get('/equipement', [EquipementController::class, 'index'])->middleware('auth:api');
+Route::post('equipement', [EquipementController::class, 'store'])->middleware('auth:api');
+Route::put('/equipement/{id}', [EquipementController::class, 'update'])->middleware('auth:api');
+Route::delete('/equipement/{id}', [EquipementController::class, 'destroy'])->middleware('auth:api');
+
+
+
+
+//route type equipement
+Route::get('/typeequipement', [typeEquipementController::class, 'index'])->middleware('auth:api');
+Route::post('typeequipement', [typeEquipementController::class, 'store'])->middleware('auth:api');
+Route::put('/typeequipement/{id}', [typeEquipementController::class, 'update'])->middleware('auth:api');
+Route::delete('/typeequipement/{id}', [typeEquipementController::class, 'destroy'])->middleware('auth:api');
+
+
+
+
+//route inventaire equipement
+Route::get('/inventaireequipement', [inventaireEquipementController::class, 'index'])->middleware('auth:api');
+Route::post('inventaireequipement', [inventaireEquipementController::class, 'store'])->middleware('auth:api');
+Route::put('/inventaireequipement/{id}', [inventaireEquipementController::class, 'update'])->middleware('auth:api');
+Route::delete('/inventaireequipement/{id}', [inventaireEquipementController::class, 'destroy'])->middleware('auth:api');
