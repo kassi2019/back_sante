@@ -27,10 +27,12 @@ class inventaireEquipementService
         $userId = auth()->user()->id; // Assurez-vous que l'authentification est bien configurée
         $superviseurId = auth()->user()->responsable_id;
         $districtId = auth()->user()->respo_superieur_id;
+        $respoEquipeId = auth()->user()->respo_superieur_id;
         // Ajouter l'ID de l'utilisateur aux données
         $data['user_id'] = $userId;
         $data['superviseur_id'] = $superviseurId;
         $data['resp_sup_id'] = $districtId;
+        $data['responsable_equipe_id'] = $respoEquipeId;
         $data['heure_creation'] = Carbon::now();
         // Si la validation réussit, créer un nouveau nature economique
         $data = inventaireEquipement::create($data);

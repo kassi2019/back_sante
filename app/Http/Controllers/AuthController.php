@@ -43,6 +43,7 @@ class AuthController extends Controller
                     "libelle_role" => $region->libelle_role,
                     "nom_responsable" => $region->nom_responsable,
                     "responsable_id" => $region->responsable_id,
+                    "responsable_equipe_id"=>$region->responsable_equipe_id,
                     "code_role" => $region->code
                 );
 
@@ -54,7 +55,7 @@ class AuthController extends Controller
         FROM users rm
         JOIN tb_roles ro ON rm.id_roles = ro.id
 
-        WHERE rm.responsable_id='$userId' OR rm.respo_superieur_id='$userId' OR rm.user_id='$userId'
+        WHERE rm.responsable_id='$userId' OR rm.respo_superieur_id='$userId' OR rm.user_id='$userId' OR rm.responsable_equipe_id='$userId'
 
           ;");
             foreach ($res as $region) {
@@ -68,6 +69,7 @@ class AuthController extends Controller
                     "libelle_role" => $region->libelle_role,
                     "nom_responsable" => $region->nom_responsable,
                     "responsable_id" => $region->responsable_id,
+                    "responsable_equipe_id" => $region->responsable_equipe_id,
                     "code_role" => $region->code
                 );
 
@@ -105,6 +107,7 @@ class AuthController extends Controller
             'id_roles' => $validated['id_roles'],
             'responsable_id' => $request->responsable_id,
             'respo_superieur_id' => $request->respo_superieur_id,
+            'responsable_equipe_id' => $request->responsable_equipe_id,
             'heure_creation' => Carbon::now(),
             'user_id' => $userId
 
@@ -145,7 +148,7 @@ class AuthController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['noms', 'prenoms', 'numero', 'id_roles', 'responsable_id']);
+        $data = $request->only(['noms', 'prenoms', 'numero', 'id_roles', 'responsable_id','responsable_equipe_id']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

@@ -21,12 +21,17 @@ class EquipementController extends Controller
         $products = $this->equipementService->listeequipement();
         return response()->json($products);
     }
+    public function afficheTypeEquipement()
+    {
 
+        $products = $this->equipementService->groupeParTypeMedicament();
+        return response()->json($products);
+    }
     // Méthode pour créer un Fonction
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['libelle', 'type_equipement_id']);
+        $data = $request->only(['libelle', 'type_equipement_id', "quantite"]);
 
         // Utiliser le service pour créer le Fonction
         $result = $this->equipementService->creationequipement($data);
@@ -51,7 +56,7 @@ class EquipementController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['libelle', 'type_equipement_id']);
+        $data = $request->only(['libelle', 'type_equipement_id',"quantite"]);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

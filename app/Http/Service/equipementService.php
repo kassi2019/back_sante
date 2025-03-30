@@ -2,9 +2,11 @@
 
 namespace App\Http\Service;
 use App\Models\equipement;
+use App\Models\histoEquipement;
 use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\DB;
 class equipementService
 {
 
@@ -20,32 +22,48 @@ class equipementService
     {
         return equipement::all();
     }
+    public function groupeParTypeMedicament()
+    {
+        // $roleId = auth()->user()->id_roles;
 
+        $res = DB::select("SELECT eq.type_equipement_id,te.libelle as libelle_type_equipement
+FROM db_asc_sante.tb_equipements eq
+inner join db_asc_sante.tb_type_equipements te on te.id=eq.type_equipement_id
+group by eq.type_equipement_id,te.libelle
+          ;");
+        return $res;
+
+
+    }
     public function creationequipement(array $data)
     {
-        // Utilisation du service ValidationService pour valider les données
         $errors = $this->validationService->validateLibelle($data);
 
-        // Si des erreurs de validation existent, retourner les erreurs
         if ($errors) {
             return ['errors' => $errors];
         }
 
-        // Récupérer l'ID de l'utilisateur connecté
-        $userId = auth()->user()->id; // Assurez-vous que l'authentification est bien configurée
+        $userId = auth()->user()->id;
 
-        // Ajouter l'ID de l'utilisateur aux données
+
         $data['user_id'] = $userId;
         $data['heure_creation'] = Carbon::now();
-        // Si la validation réussit, créer un nouveau nature economique
-        $data = equipement::create($data);
-
-        return ['equipement' => $data];
+        $equipement = equipement::create($data);
+        if ($equipement) {
+            histoEquipement::create([
+                'equipement_id' => $equipement->id,
+                'libelle' => $equipement->libelle,
+                'quantite' => $equipement->quantite,
+                'type_equipement_id' => $equipement->type_equipement_id,
+                'heure_creation' => Carbon::now(),
+                'user_id' => $equipement->user_id,
+            ]);
+        }
+        return ['equipement' => $equipement];
     }
 
 
 
-    // Méthode pour modifier un produit
     public function updateequipement($id, array $data)
     {
         // Valider les données d'entrée pour la mise à jour
@@ -56,19 +74,44 @@ class equipementService
             return ['errors' => $errors];
         }
 
-        // Trouver le produit à mettre à jour
-        $equipe = equipement::find($id);
+        // Trouver l'équipement à mettre à jour
+        $equipement = equipement::find($id);
 
-        // Si le produit n'existe pas, lever une exception
-        if (!$equipe) {
-            throw new ModelNotFoundException('Equipement non trouvé.');
+        // Si l'équipement n'existe pas, lever une exception
+        if (!$equipement) {
+            throw new ModelNotFoundException('Équipement non trouvé.');
         }
 
-        // Mettre à jour les informations du produit
-        $equipe->update($data);
+        // Mettre à jour les informations de l'équipement
+        $equipement->update($data);
 
-        return ['equipement' => $equipe];
+        // Vérifier si une entrée existe déjà dans histoEquipement
+        $historique = histoEquipement::where('equipement_id', $id)->first();
+
+        if ($historique) {
+            // Mise à jour de l'historique si l'entrée existe
+            $historique->update([
+                'libelle' => $equipement->libelle,
+                'quantite' => $equipement->quantite,
+                'type_equipement_id' => $equipement->type_equipement_id,
+                'heure_creation' => Carbon::now(),
+                'user_id' => $equipement->user_id,
+            ]);
+        } else {
+            // Création d'un nouvel historique si aucune entrée n'existe
+            histoEquipement::create([
+                'equipement_id' => $equipement->id,
+                'libelle' => $equipement->libelle,
+                'quantite' => $equipement->quantite,
+                'type_equipement_id' => $equipement->type_equipement_id,
+                'heure_creation' => Carbon::now(),
+                'user_id' => $equipement->user_id,
+            ]);
+        }
+
+        return ['equipement' => $equipement];
     }
+
 
     // Méthode pour supprimer un produit
     public function deleteequipement($id)
