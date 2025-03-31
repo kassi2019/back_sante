@@ -4,6 +4,8 @@ namespace App\Http\Service;
 use App\Models\affectationEquipement;
 use App\Models\histoEquipement;
 use App\Models\equipement;
+use App\Models\histoAffectationEquipement;
+
 use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -19,119 +21,63 @@ class affectationEquipementService
         $this->validationService = $validationService;
     }
 
-    public function listeequipement()
+    public function listeequipementAffecte()
     {
-        return affectationEquipement::all();
-    }
-    public function creationequipement(array $data)
-    {
-
+        $roleid = auth()->user()->id_roles;
         $userId = auth()->user()->id;
+        if ($roleid == 7) {
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+FROM tb_affectation_equipements eq
+inner join tb_equipements te on te.id=eq.equipement_id
+inner join users us on us.id=eq.agent_id
 
 
-        $data['user_id'] = $userId;
-        $data['heure_creation'] = Carbon::now();
-        $equipement = affectationEquipement::create($data);
-        $historique = equipement::where('equipement_id', $id)->first();
-        if ($historique) {
-            equipement::update([
-                'quantite' => $equipement->quantite,
-                'type_equipement_id' => $equipement->type_equipement_id,
-                'heure_creation' => Carbon::now(),
-                'user_id' => $equipement->user_id,
-            ]);
+group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+          ;");
+        }else{
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+FROM tb_affectation_equipements eq
+inner join tb_equipements te on te.id=eq.equipement_id
+inner join users us on us.id=eq.agent_id
 
+where eq.agent_id='$userId' or eq.superviseur_id='$userId'
 
+group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+          ;");
         }
-        return ['equipement' => $equipement];
+        return $res;
     }
 
 
-
-    public function updateequipement($id, array $data)
+    public function groupeParAgent()
     {
-        // Valider les données d'entrée pour la mise à jour
-        $errors = $this->validationService->validateLibelle($data);
+        $roleid = auth()->user()->id_roles;
+        $userId = auth()->user()->id;
+        // $roleId = auth()->user()->id_roles;
+        if ($roleid == 7) {
+            $res = DB::select("SELECT eq.agent_id,concat(us.noms,' ',us.prenoms) nom_agent
+FROM tb_affectation_equipements eq
+inner join tb_equipements te on te.id=eq.equipement_id
+inner join users us on us.id=eq.agent_id
+group by eq.agent_id,us.noms,us.prenoms
+          ;");
+        }else{
+            $res = DB::select("SELECT eq.agent_id,concat(us.noms,' ',us.prenoms) nom_agent
+FROM tb_affectation_equipements eq
+inner join tb_equipements te on te.id=eq.equipement_id
+inner join users us on us.id=eq.agent_id
 
-        // Si des erreurs existent, retourner les erreurs
-        if ($errors) {
-            return ['errors' => $errors];
+where eq.agent_id='$userId' or eq.superviseur_id='$userId'
+
+group by eq.agent_id,us.noms,us.prenoms
+          ;");
         }
 
-        // Trouver l'équipement à mettre à jour
-        $equipement = equipement::find($id);
+        return $res;
 
-        // Si l'équipement n'existe pas, lever une exception
-        if (!$equipement) {
-            throw new ModelNotFoundException('Équipement non trouvé.');
-        }
 
-        // Mettre à jour les informations de l'équipement
-        $equipement->update($data);
-
-        // Vérifier si une entrée existe déjà dans histoEquipement
-        $historique = histoEquipement::where('equipement_id', $id)->first();
-
-        if ($historique) {
-            // Mise à jour de l'historique si l'entrée existe
-            $historique->update([
-                'libelle' => $equipement->libelle,
-                'quantite' => $equipement->quantite,
-                'type_equipement_id' => $equipement->type_equipement_id,
-                'heure_creation' => Carbon::now(),
-                'user_id' => $equipement->user_id,
-            ]);
-        } else {
-            // Création d'un nouvel historique si aucune entrée n'existe
-            histoEquipement::create([
-                'equipement_id' => $equipement->id,
-                'libelle' => $equipement->libelle,
-                'quantite' => $equipement->quantite,
-                'type_equipement_id' => $equipement->type_equipement_id,
-                'heure_creation' => Carbon::now(),
-                'user_id' => $equipement->user_id,
-            ]);
-        }
-
-        return ['equipement' => $equipement];
     }
 
-
-    public function updateequipementrenouvellement($id, array $data)
-    {
-        // Valider les données d'entrée pour la mise à jour
-        $errors = $this->validationService->validateLibelle($data);
-
-        // Si des erreurs existent, retourner les erreurs
-        if ($errors) {
-            return ['errors' => $errors];
-        }
-
-        // Trouver l'équipement à mettre à jour
-        $equipement = equipement::find($id);
-
-        // Si l'équipement n'existe pas, lever une exception
-        if (!$equipement) {
-            throw new ModelNotFoundException('Équipement non trouvé.');
-        }
-
-        // Mettre à jour les informations de l'équipement
-        $equipement->update($data);
-
-        // Création d'un nouvel historique si aucune entrée n'existe
-        histoEquipement::create([
-            'equipement_id' => $equipement->id,
-            'libelle' => $equipement->libelle,
-            'quantite' => $equipement->quantitesaisir,
-            'type_equipement_id' => $equipement->type_equipement_id,
-            'heure_creation' => Carbon::now(),
-            'user_id' => $equipement->user_id,
-            'statut' => 1
-        ]);
-
-
-        return ['equipement' => $equipement];
-    }
     // Méthode pour supprimer un produit
     public function deleteequipement($id)
     {
@@ -150,7 +96,24 @@ class affectationEquipementService
     }
 
 
+    public function updateAffectationEquipement($id, array $data)
+    {
+        // Valider les données d'entrée pour la mise à jour
 
+
+        // Trouver le produit à mettre à jour
+        $affectation = affectationEquipement::find($id);
+
+        // Si le produit n'existe pas, lever une exception
+        if (!$affectation) {
+            throw new ModelNotFoundException('affectation non trouvé.');
+        }
+
+        // Mettre à jour les informations du produit
+        $affectation->update($data);
+
+        return ['affectation' => $affectation];
+    }
 
     // Méthode pour récupérer un produit par son ID
     public function geteById($id)

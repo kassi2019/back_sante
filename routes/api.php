@@ -18,6 +18,7 @@ use App\Http\Controllers\zoneInterventionController;
 use App\Http\Controllers\EquipementController;
 use App\Http\Controllers\typeEquipementController;
 use App\Http\Controllers\inventaireEquipementController;
+use App\Http\Controllers\affectationEquipementController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -187,3 +188,14 @@ Route::get('/inventaireequipement', [inventaireEquipementController::class, 'ind
 Route::post('inventaireequipement', [inventaireEquipementController::class, 'store'])->middleware('auth:api');
 Route::put('/inventaireequipement/{id}', [inventaireEquipementController::class, 'update'])->middleware('auth:api');
 Route::delete('/inventaireequipement/{id}', [inventaireEquipementController::class, 'destroy'])->middleware('auth:api');
+
+
+
+
+
+//route affectation d equipement
+Route::get('/listeEquipementAffecte', [affectationEquipementController::class, 'index'])->middleware('auth:api');
+Route::post('Affectationequipement', [affectationEquipementController::class, 'store'])->middleware('auth:api');
+Route::put('/Affectationequipement/{id}', [affectationEquipementController::class, 'update'])->middleware('auth:api');
+// Route::delete('/inventaireequipement/{id}', [affectationEquipementController::class, 'destroy'])->middleware('auth:api');
+Route::get('/groupeAgentAffecte', [affectationEquipementController::class, 'groupeAgentAffecte'])->middleware('auth:api');
