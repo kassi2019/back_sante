@@ -171,7 +171,7 @@ Route::post('equipement', [EquipementController::class, 'store'])->middleware('a
 Route::put('/equipement/{id}', [EquipementController::class, 'update'])->middleware('auth:api');
 Route::delete('/equipement/{id}', [EquipementController::class, 'destroy'])->middleware('auth:api');
 Route::get('/afficheTypeEquipement', [EquipementController::class,'afficheTypeEquipement'])->middleware('auth:api');
-
+Route::put('/updateRenouvellement/{id}', [EquipementController::class, 'updateRenouvellement'])->middleware('auth:api');
 
 //route type equipement
 Route::get('/typeequipement', [typeEquipementController::class, 'index'])->middleware('auth:api');

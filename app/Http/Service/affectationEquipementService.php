@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Service;
-use App\Models\equipement;
+use App\Models\affectationEquipement;
 use App\Models\histoEquipement;
+use App\Models\equipement;
 use Carbon\Carbon;
 use App\Http\Service\ValidationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-class equipementService
+class affectationEquipementService
 {
 
     protected $validationService;
@@ -20,44 +21,27 @@ class equipementService
 
     public function listeequipement()
     {
-        return equipement::all();
-    }
-    public function groupeParTypeMedicament()
-    {
-        // $roleId = auth()->user()->id_roles;
-
-        $res = DB::select("SELECT eq.type_equipement_id,te.libelle as libelle_type_equipement
-FROM db_asc_sante.tb_equipements eq
-inner join db_asc_sante.tb_type_equipements te on te.id=eq.type_equipement_id
-group by eq.type_equipement_id,te.libelle
-          ;");
-        return $res;
-
-
+        return affectationEquipement::all();
     }
     public function creationequipement(array $data)
     {
-        $errors = $this->validationService->validateLibelle($data);
-
-        if ($errors) {
-            return ['errors' => $errors];
-        }
 
         $userId = auth()->user()->id;
 
 
         $data['user_id'] = $userId;
         $data['heure_creation'] = Carbon::now();
-        $equipement = equipement::create($data);
-        if ($equipement) {
-            histoEquipement::create([
-                'equipement_id' => $equipement->id,
-                'libelle' => $equipement->libelle,
+        $equipement = affectationEquipement::create($data);
+        $historique = equipement::where('equipement_id', $id)->first();
+        if ($historique) {
+            equipement::update([
                 'quantite' => $equipement->quantite,
                 'type_equipement_id' => $equipement->type_equipement_id,
                 'heure_creation' => Carbon::now(),
                 'user_id' => $equipement->user_id,
             ]);
+
+
         }
         return ['equipement' => $equipement];
     }

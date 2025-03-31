@@ -56,7 +56,7 @@ class EquipementController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['libelle', 'type_equipement_id',"quantite"]);
+        $data = $request->only(['libelle', 'type_equipement_id', "quantite"]);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté
@@ -80,7 +80,32 @@ class EquipementController extends Controller
         }
     }
 
+    public function updateRenouvellement(Request $request, $id)
+    {
+        // Récupérer les données envoyées dans la requête
+        $data = $request->only(['libelle', 'type_equipement_id', "quantite", "quantitesaisir"]);
 
+        try {
+            // Récupérer l'ID de l'utilisateur connecté
+            $userId = auth()->user()->id;
+
+            // Ajouter l'ID de l'utilisateur aux données
+            $data['user_id'] = $userId;
+
+            // Utiliser le service equipementService pour mettre à jour la fonction
+            $result = $this->equipementService->updateequipementrenouvellement($id, $data);
+
+            // Retourner la fonction mise à jour
+            return response()->json([
+                'message' => 'equipement mise à jour avec succès.',
+                'equipement' => $result['equipement']
+            ], 200); // Code HTTP 200 pour "OK"
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 404); // Code HTTP 404 pour "Non trouvé"
+        }
+    }
     // Méthode pour supprimer un Fonction
     public function destroy($id)
     {
