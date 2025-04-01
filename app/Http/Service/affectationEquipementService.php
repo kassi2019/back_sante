@@ -26,23 +26,23 @@ class affectationEquipementService
         $roleid = auth()->user()->id_roles;
         $userId = auth()->user()->id;
         if ($roleid == 7) {
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
 
 
-group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
           ;");
         }else{
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
 
 where eq.agent_id='$userId' or eq.superviseur_id='$userId'
 
-group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise
+group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
           ;");
         }
         return $res;

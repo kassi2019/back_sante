@@ -199,3 +199,4 @@ Route::post('Affectationequipement', [affectationEquipementController::class, 's
 Route::put('/Affectationequipement/{id}', [affectationEquipementController::class, 'update'])->middleware('auth:api');
 // Route::delete('/inventaireequipement/{id}', [affectationEquipementController::class, 'destroy'])->middleware('auth:api');
 Route::get('/groupeAgentAffecte', [affectationEquipementController::class, 'groupeAgentAffecte'])->middleware('auth:api');
+Route::put('/AffectationEquipementDispo/{id}', [affectationEquipementController::class, 'updateAffectationEquipement'])->middleware('auth:api');

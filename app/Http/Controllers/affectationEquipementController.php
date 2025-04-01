@@ -110,7 +110,7 @@ class affectationEquipementController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['type_equipement_id', 'equipement_id', 'quantite_affecte','status','superviseur_id']);
+        $data = $request->only(['type_equipement_id', 'equipement_id', 'quantite_affecte', 'status', 'superviseur_id']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté
@@ -131,6 +131,37 @@ class affectationEquipementController extends Controller
             return response()->json([
                 'error' => $e->getMessage()
             ], 404); // Code HTTP 404 pour "Non trouvé"
+        }
+    }
+
+
+
+
+
+
+
+    public function updateAffectationEquipement(Request $request, $id)
+    {
+        $heure_creation = Carbon::now();
+        // Recherche de l'affectation de l'équipement
+        $historique1 = affectationEquipement::where('equipement_id', $request->equipement_id)
+            ->where('agent_id', $request->agent_id)
+            ->first();
+        if ($historique1) {
+            $sommeQteUtilise = $historique1->quantite_utilise + $request->quantite_saisir;
+            $sommeQteDispo = $historique1->quantite_affecte - $request->quantite_saisir;
+            $historique = affectationEquipement::where('id', $id)->update([
+                // 'type_equipement_id' => $request->type_equipement_id,
+                'quantite_affecte' => $sommeQteDispo,
+                // 'superviseur_id' => $request->superviseur_id,
+                // 'agent_id' => $request->agent_id,
+                // 'heure_saisir_agent' => $heure_creation,
+                 'date_saisir_agent' => $heure_creation,
+                // 'user_id' => $userId,
+                'quantite_utilise' => $sommeQteUtilise,
+                'quantite_saisir' => $request->quantite_saisir
+            ]);
+
         }
     }
 }
