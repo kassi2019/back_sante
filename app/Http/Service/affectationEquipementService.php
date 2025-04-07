@@ -20,13 +20,29 @@ class affectationEquipementService
     {
         $this->validationService = $validationService;
     }
+    public function listehistoAffectation()
+    {
+        $roleid = auth()->user()->id_roles;
+        $userId = auth()->user()->id;
+        if ($roleid == 7) {
+            $res = DB::select("SELECT *
+FROM tb_histo_affectation_equipements eq
+          ;");
+        } else {
+            $res = DB::select("SELECT *
+FROM tb_histo_affectation_equipements eq
+where eq.agent_id='$userId' or eq.superviseur_id='$userId'
 
+          ;");
+        }
+        return $res;
+    }
     public function listeequipementAffecte()
     {
         $roleid = auth()->user()->id_roles;
         $userId = auth()->user()->id;
         if ($roleid == 7) {
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
@@ -35,7 +51,7 @@ inner join users us on us.id=eq.agent_id
 group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
           ;");
         }else{
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
@@ -144,5 +160,27 @@ group by eq.agent_id,us.noms,us.prenoms
 
         // Si l'utilisateur n'est pas authentifié, retourner une liste vide ou une erreur
         return [];
+    }
+
+
+
+
+    public function updateHistoAffectationEquipement($id, array $data)
+    {
+        // Valider les données d'entrée pour la mise à jour
+
+
+        // Trouver le produit à mettre à jour
+        $affectation = histoAffectationEquipement::find($id);
+
+        // Si le produit n'existe pas, lever une exception
+        if (!$affectation) {
+            throw new ModelNotFoundException('affectation non trouvé.');
+        }
+
+        // Mettre à jour les informations du produit
+        $affectation->update($data);
+
+        return ['histoAffectationEquipement' => $affectation];
     }
 }

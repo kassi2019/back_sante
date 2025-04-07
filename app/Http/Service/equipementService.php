@@ -53,6 +53,8 @@ group by eq.type_equipement_id,te.libelle
             histoEquipement::create([
                 'equipement_id' => $equipement->id,
                 'libelle' => $equipement->libelle,
+                'code' => $equipement->code,
+                'unite_comptage' => $equipement->unite_comptage,
                 'quantite' => $equipement->quantite,
                 'type_equipement_id' => $equipement->type_equipement_id,
                 'heure_creation' => Carbon::now(),

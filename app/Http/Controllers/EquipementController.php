@@ -31,7 +31,7 @@ class EquipementController extends Controller
     public function store(Request $request)
     {
         // Récupérer les données de la requête
-        $data = $request->only(['libelle', 'type_equipement_id', "quantite"]);
+        $data = $request->only(['libelle','code', 'type_equipement_id', "quantite",'unite_comptage']);
 
         // Utiliser le service pour créer le Fonction
         $result = $this->equipementService->creationequipement($data);
@@ -56,7 +56,7 @@ class EquipementController extends Controller
     public function update(Request $request, $id)
     {
         // Récupérer les données envoyées dans la requête
-        $data = $request->only(['libelle', 'type_equipement_id', "quantite"]);
+        $data = $request->only(['libelle', 'type_equipement_id', "quantite",'code','unite_comptage']);
 
         try {
             // Récupérer l'ID de l'utilisateur connecté

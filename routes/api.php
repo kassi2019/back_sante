@@ -87,6 +87,8 @@ Route::delete('/district/{id}', [districtController::class, 'destroy'])->middlew
 // Route::get('/district', [districtController::class, 'index'])->middleware('auth:api');
 Route::get('/listeZoneResponsable/{id}', [districtController::class, 'listeZoneResponsable'])->middleware('auth:api');
 
+Route::post('importationDistrict', [districtController::class, 'importationDistrict'])->middleware('auth:api');
+
 // route zone intervention
 Route::get('/listemedicament', [MedicamentController::class, 'index']);
 Route::post('ajoutermedicament', [MedicamentController::class, 'store'])->middleware('auth:api');
@@ -200,3 +202,13 @@ Route::put('/Affectationequipement/{id}', [affectationEquipementController::clas
 // Route::delete('/inventaireequipement/{id}', [affectationEquipementController::class, 'destroy'])->middleware('auth:api');
 Route::get('/groupeAgentAffecte', [affectationEquipementController::class, 'groupeAgentAffecte'])->middleware('auth:api');
 Route::put('/AffectationEquipementDispo/{id}', [affectationEquipementController::class, 'updateAffectationEquipement'])->middleware('auth:api');
+
+Route::get('/listehistoAffectation', [affectationEquipementController::class, 'listehistoAffectation'])->middleware('auth:api');
+
+
+
+Route::put('/updateHistoAffectationEquipement/{id}', [affectationEquipementController::class, 'updateHistoAffectationEquipement'])->middleware('auth:api');
+
+
+Route::post('verificationStockParAgent', [affectationEquipementController::class, 'verificationStockParAgent'])->middleware('auth:api');
+Route::post('AnnulationStockParAgent', [affectationEquipementController::class, 'AnnulationStockParAgent'])->middleware('auth:api');
