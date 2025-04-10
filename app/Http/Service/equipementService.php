@@ -57,6 +57,8 @@ group by eq.type_equipement_id,te.libelle
                 'unite_comptage' => $equipement->unite_comptage,
                 'quantite' => $equipement->quantite,
                 'type_equipement_id' => $equipement->type_equipement_id,
+                'numero_lot' => $equipement->numero_lot,
+                'date_peremption' => $equipement->date_peremption,
                 'heure_creation' => Carbon::now(),
                 'user_id' => $equipement->user_id,
             ]);

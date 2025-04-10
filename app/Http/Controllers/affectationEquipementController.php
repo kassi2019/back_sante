@@ -284,14 +284,12 @@ class affectationEquipementController extends Controller
             return response()->json([
                 'message' => 'Mise à jour effectuée avec succès.',
                 'nouvelle_quantite' => $request->quantite_recu,
-                
+
             ], 200);
         }
 
         // Si aucune mise à jour n'est nécessaire
-        return response()->json([
-            'message' => 'Aucune modification apportée. La quantité est déjà correcte.'
-        ], 200);
+      
     }
 
 
