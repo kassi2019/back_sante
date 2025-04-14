@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Http\Service\equipementService;
 use Illuminate\Http\Request;
-
+use App\Models\equipement;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class EquipementController extends Controller
 {
@@ -14,6 +14,14 @@ class EquipementController extends Controller
     public function __construct(equipementService $serviceFonction)
     {
         $this->equipementService = $serviceFonction;
+    }
+
+        public function listeGroupeEquipementOpt()
+    {
+
+        $products = $this->equipementService->listeGroupeEquipement();
+
+        return response()->json($products);
     }
     public function index()
     {
@@ -80,32 +88,37 @@ class EquipementController extends Controller
         }
     }
 
-    public function updateRenouvellement(Request $request, $id)
-    {
-        // Récupérer les données envoyées dans la requête
-        $data = $request->only(['libelle', 'type_equipement_id', "quantite", "quantitesaisir"]);
+    // public function updateRenouvellement(Request $request)
+    // {
 
-        try {
-            // Récupérer l'ID de l'utilisateur connecté
-            $userId = auth()->user()->id;
+    //     $historique1 = equipement::where('id', $request->equipement_id)
+    //         ->where('agent_id', $request->agent_id)->where('numerolot', $request->numerolot)
+    //         ->first();
 
-            // Ajouter l'ID de l'utilisateur aux données
-            $data['user_id'] = $userId;
+    //     if ($historique1) {
 
-            // Utiliser le service equipementService pour mettre à jour la fonction
-            $result = $this->equipementService->updateequipementrenouvellement($id, $data);
+    //     }
+    //     // Récupérer les données envoyées dans la requête
+    //     $data = $request->only(['libelle', 'type_equipement_id', "quantite", "quantitesaisir"]);
+    //     try {
+    //         // Récupérer l'ID de l'utilisateur connecté
+    //         $userId = auth()->user()->id;
 
-            // Retourner la fonction mise à jour
-            return response()->json([
-                'message' => 'equipement mise à jour avec succès.',
-                'equipement' => $result['equipement']
-            ], 200); // Code HTTP 200 pour "OK"
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 404); // Code HTTP 404 pour "Non trouvé"
-        }
-    }
+    //         // Ajouter l'ID de l'utilisateur aux données
+    //         $data['user_id'] = $userId;
+    //         // Utiliser le service equipementService pour mettre à jour la fonction
+    //         $result = $this->equipementService->updateequipementrenouvellement($id, $data);
+    //         // Retourner la fonction mise à jour
+    //         return response()->json([
+    //             'message' => 'equipement mise à jour avec succès.',
+    //             'equipement' => $result['equipement']
+    //         ], 200); // Code HTTP 200 pour "OK"
+    //     } catch (ModelNotFoundException $e) {
+    //         return response()->json([
+    //             'error' => $e->getMessage()
+    //         ], 404); // Code HTTP 404 pour "Non trouvé"
+    //     }
+    // }
     // Méthode pour supprimer un Fonction
     public function destroy($id)
     {

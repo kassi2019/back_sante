@@ -175,7 +175,7 @@ Route::put('/equipement/{id}', [EquipementController::class, 'update'])->middlew
 Route::delete('/equipement/{id}', [EquipementController::class, 'destroy'])->middleware('auth:api');
 Route::get('/afficheTypeEquipement', [EquipementController::class,'afficheTypeEquipement'])->middleware('auth:api');
 Route::put('/updateRenouvellement/{id}', [EquipementController::class, 'updateRenouvellement'])->middleware('auth:api');
-
+Route::get('/listeGroupeEquipementOpt', [EquipementController::class, 'listeGroupeEquipementOpt'])->middleware('auth:api');
 //route type equipement
 Route::get('/typeequipement', [typeEquipementController::class, 'index'])->middleware('auth:api');
 Route::post('typeequipement', [typeEquipementController::class, 'store'])->middleware('auth:api');
@@ -204,6 +204,7 @@ Route::get('/groupeAgentAffecte', [affectationEquipementController::class, 'grou
 Route::put('/AffectationEquipementDispo/{id}', [affectationEquipementController::class, 'updateAffectationEquipement'])->middleware('auth:api');
 
 Route::get('/listehistoAffectation', [affectationEquipementController::class, 'listehistoAffectation'])->middleware('auth:api');
+Route::get('/AfficheAscAuMoinUnEquipement', [affectationEquipementController::class, 'AscAuMoinUnEquipement'])->middleware('auth:api');
 
 
 

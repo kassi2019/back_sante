@@ -42,7 +42,7 @@ where eq.agent_id='$userId' or eq.superviseur_id='$userId'
         $roleid = auth()->user()->id_roles;
         $userId = auth()->user()->id;
         if ($roleid == 7) {
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup,eq.numerolot,eq.date_expiration
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
@@ -51,7 +51,7 @@ inner join users us on us.id=eq.agent_id
 group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
           ;");
         }else{
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup,eq.numerolot,eq.date_expiration
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
@@ -71,21 +71,23 @@ group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_
         $userId = auth()->user()->id;
         // $roleId = auth()->user()->id_roles;
         if ($roleid == 7) {
-            $res = DB::select("SELECT eq.agent_id,concat(us.noms,' ',us.prenoms) nom_agent
-FROM tb_affectation_equipements eq
-inner join tb_equipements te on te.id=eq.equipement_id
-inner join users us on us.id=eq.agent_id
-group by eq.agent_id,us.noms,us.prenoms
+            $res = DB::select("SELECT us.id as agent_id,concat(us.noms,' ',us.prenoms) nom_agent,us.responsable_id,concat(us1.noms,' ',us1.prenoms) nom_superviseur
+
+FROM  users us,
+ tb_roles ro,
+ users us1
+WHERE us.responsable_id IS NOT NULL AND us.id_roles=ro.id AND ro.code=2 AND us.responsable_id=us1.id
+
           ;");
         }else{
-            $res = DB::select("SELECT eq.agent_id,concat(us.noms,' ',us.prenoms) nom_agent
-FROM tb_affectation_equipements eq
-inner join tb_equipements te on te.id=eq.equipement_id
-inner join users us on us.id=eq.agent_id
+            $res = DB::select("
+SELECT us.id as agent_id,concat(us.noms,' ',us.prenoms) nom_agent,us.responsable_id,concat(us1.noms,' ',us1.prenoms) nom_superviseur
 
-where eq.agent_id='$userId' or eq.superviseur_id='$userId'
+FROM  users us,
+ tb_roles ro,
+ users us1
+WHERE us.responsable_id IS NOT NULL AND us.id_roles=ro.id AND ro.code=2 AND us.responsable_id=us1.id and us.responsable_id='$userId' or us.respo_superieur_id='$userId'
 
-group by eq.agent_id,us.noms,us.prenoms
           ;");
         }
 
@@ -182,5 +184,32 @@ group by eq.agent_id,us.noms,us.prenoms
         $affectation->update($data);
 
         return ['histoAffectationEquipement' => $affectation];
+    }
+
+
+
+
+    public function AfficheAscAuMoinUnEquipement()
+    {
+        $roleid = auth()->user()->id_roles;
+        $userId = auth()->user()->id;
+        // $roleId = auth()->user()->id_roles;
+        if ($roleid == 7) {
+            $res = DB::select("SELECT distinct CONCAT(ut.noms,' ',ut.prenoms) AS nom_prenoms_asc,ae.agent_id
+FROM tb_affectation_equipements ae
+INNER JOIN users ut ON ae.agent_id=ut.id
+          ;");
+        } else {
+            $res = DB::select("
+SELECT distinct CONCAT(ut.noms,' ',ut.prenoms) AS nom_prenoms_asc,ae.agent_id
+FROM tb_affectation_equipements ae
+INNER JOIN users ut ON ae.agent_id=ut.id WHERE ut.id='$userId'
+
+          ;");
+        }
+
+        return $res;
+
+
     }
 }

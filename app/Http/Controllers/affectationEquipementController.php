@@ -39,8 +39,12 @@ class affectationEquipementController extends Controller
         $products = $this->affectationEquipementService->groupeParAgent();
         return response()->json($products);
     }
+ public function AscAuMoinUnEquipement()
+    {
 
-
+        $products = $this->affectationEquipementService->AfficheAscAuMoinUnEquipement();
+        return response()->json($products);
+    }
     // Méthode pour créer un Fonction
     public function store(Request $request)
     {
@@ -50,7 +54,7 @@ class affectationEquipementController extends Controller
 
         // Recherche de l'affectation de l'équipement
         $historique1 = affectationEquipement::where('equipement_id', $request->equipement_id)
-            ->where('agent_id', $request->agent_id)
+            ->where('agent_id', $request->agent_id)->where('numerolot', $request->numerolot)
             ->first();
 
         // Si l'historique existe, on met à jour l'affectation
@@ -62,6 +66,8 @@ class affectationEquipementController extends Controller
                 'qte_recu_sup' => $sommeQte,
                 'superviseur_id' => $request->superviseur_id,
                 'agent_id' => $request->agent_id,
+                'numerolot' => $request->numerolot,
+                'date_expiration' => $request->date_expiration,
                 'heure_creation' => $heure_creation,
                 'user_id' => $userId,
                 'quantite_dispo' => $request->quantite_dispo,
@@ -74,6 +80,8 @@ class affectationEquipementController extends Controller
                 'equipement_id' => $request->equipement_id,
                 'quantite_affecte' => $request->quantite_affecte,
                 'qte_recu_sup' => $request->quantite_affecte,
+                'numerolot' => $request->numerolot,
+                'date_expiration' => $request->date_expiration,
                 'superviseur_id' => $request->superviseur_id,
                 'agent_id' => $request->agent_id,
                 'heure_creation' => $heure_creation,
@@ -84,14 +92,15 @@ class affectationEquipementController extends Controller
         }
 
         // Mise à jour de l'équipement dans l'historique
-        $historique = equipement::find($equipement->equipement_id);
-        if ($historique) {
-            $historique->update([
-                'quantite' => $equipement->quantite_dispo,
-                'heure_creation' => $heure_creation,
-                'user_id' => $userId,
-            ]);
-        }
+        // $historique = equipement::find($equipement->equipement_id, $equipement->numero_lot);
+        // if ($historique) {
+
+        $historique = equipement::where('id', $request->equipement_id)->where('numero_lot', $request->numerolot)->update([
+            'quantite' => $equipement->quantite_dispo,
+            'heure_creation' => $heure_creation,
+            'user_id' => $userId,
+        ]);
+        //}
 
         // Enregistrement dans l'historique des affectations d'équipement
         histoAffectationEquipement::create([
@@ -100,6 +109,8 @@ class affectationEquipementController extends Controller
             'equipement_id' => $equipement->equipement_id,
             'superviseur_id' => $equipement->superviseur_id,
             'quantite_affecte' => $request->quantite_affecte,
+            'numerolot' => $request->numerolot,
+            'date_expiration' => $request->date_expiration,
             'qte_affecte_initial' => $request->quantite_affecte,
             'agent_id' => $equipement->agent_id,
             'heure_creation' => $heure_creation,
@@ -257,7 +268,7 @@ class affectationEquipementController extends Controller
                 'nouvelle_quantite' => $request->quantite_recu,
                 'difference' => $difference
             ], 200);
-        }else{
+        } else {
 
 
             // Mise à jour de l'historique
@@ -289,7 +300,7 @@ class affectationEquipementController extends Controller
         }
 
         // Si aucune mise à jour n'est nécessaire
-      
+
     }
 
 

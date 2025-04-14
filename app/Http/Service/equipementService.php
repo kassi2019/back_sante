@@ -20,15 +20,22 @@ class equipementService
 
     public function listeequipement()
     {
-        return equipement::all();
+        // return equipement::all();
+ $res = DB::select(" SELECT eq.libelle,eq.code,eq.unite_comptage,eq.type_equipement_id,eq.numero_lot,eq.date_peremption,eq.quantite,eq.quantitesaisir,eq.id
+FROM tb_equipements eq
+
+group by eq.libelle,eq.code,eq.unite_comptage,eq.type_equipement_id,eq.numero_lot,eq.date_peremption,eq.quantite,eq.quantitesaisir,eq.id
+          ;");
+        return $res;
+
     }
     public function groupeParTypeMedicament()
     {
         // $roleId = auth()->user()->id_roles;
 
         $res = DB::select("SELECT eq.type_equipement_id,te.libelle as libelle_type_equipement
-FROM db_asc_sante.tb_equipements eq
-inner join db_asc_sante.tb_type_equipements te on te.id=eq.type_equipement_id
+FROM tb_equipements eq
+inner join tb_type_equipements te on te.id=eq.type_equipement_id
 group by eq.type_equipement_id,te.libelle
           ;");
         return $res;
@@ -98,6 +105,8 @@ group by eq.type_equipement_id,te.libelle
                 'libelle' => $equipement->libelle,
                 'quantite' => $equipement->quantite,
                 'type_equipement_id' => $equipement->type_equipement_id,
+                'numero_lot' => $equipement->numero_lot,
+                'date_peremption' => $equipement->date_peremption,
                 'heure_creation' => Carbon::now(),
                 'user_id' => $equipement->user_id,
             ]);
@@ -108,6 +117,8 @@ group by eq.type_equipement_id,te.libelle
                 'libelle' => $equipement->libelle,
                 'quantite' => $equipement->quantite,
                 'type_equipement_id' => $equipement->type_equipement_id,
+                'numero_lot' => $equipement->numero_lot,
+                'date_peremption' => $equipement->date_peremption,
                 'heure_creation' => Carbon::now(),
                 'user_id' => $equipement->user_id,
             ]);
@@ -201,5 +212,22 @@ group by eq.type_equipement_id,te.libelle
 
         // Si l'utilisateur n'est pas authentifié, retourner une liste vide ou une erreur
         return [];
+    }
+
+
+
+
+
+
+    public function listeGroupeEquipement()
+    {
+        // return equipement::all();
+        $res = DB::select("SELECT eq.libelle,eq.code,eq.type_equipement_id,eq.id
+FROM db_asc_sante.tb_equipements eq
+
+group by eq.libelle,eq.code,eq.type_equipement_id,eq.id
+          ;");
+        return $res;
+
     }
 }
