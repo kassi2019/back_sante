@@ -55,7 +55,7 @@ class AuthController extends Controller
         FROM users rm
         JOIN tb_roles ro ON rm.id_roles = ro.id
 
-        WHERE rm.responsable_id='$userId' OR rm.respo_superieur_id='$userId' OR rm.user_id='$userId' OR rm.responsable_equipe_id='$userId'
+        WHERE rm.responsable_id='$userId' OR rm.respo_superieur_id='$userId' OR rm.id='$userId'
 
           ;");
             foreach ($res as $region) {

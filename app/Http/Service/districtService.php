@@ -19,11 +19,28 @@ class districtService
 
     public function listedistrict()
     {
-        return district::all();
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
+        if ($roleId == 7) {
+            $res = DB::select("SELECT *
+FROM tb_districts
+
+          ;");
+            return $res;
+        }else{
+            $res = DB::select("SELECT *
+FROM tb_districts
+WHERE user_id='$userId'
+          ;");
+            return $res;
+        }
+
     }
     public function affectationdistrict($responsale)
     {
         return district::all();
+
+
     }
 
     public function listezoneResponsable($responsale)

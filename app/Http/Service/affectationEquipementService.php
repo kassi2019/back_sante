@@ -51,14 +51,14 @@ inner join users us on us.id=eq.agent_id
 group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
           ;");
         }else{
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup,eq.numerolot,eq.date_expiration
+            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup,eq.numerolot,eq.date_expiration,eq.superviseur_id
 FROM tb_affectation_equipements eq
 inner join tb_equipements te on te.id=eq.equipement_id
 inner join users us on us.id=eq.agent_id
 
 where eq.agent_id='$userId' or eq.superviseur_id='$userId'
 
-group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
+group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id,eq.superviseur_id
           ;");
         }
         return $res;
@@ -203,7 +203,7 @@ INNER JOIN users ut ON ae.agent_id=ut.id
             $res = DB::select("
 SELECT distinct CONCAT(ut.noms,' ',ut.prenoms) AS nom_prenoms_asc,ae.agent_id
 FROM tb_affectation_equipements ae
-INNER JOIN users ut ON ae.agent_id=ut.id WHERE ut.id='$userId'
+INNER JOIN users ut ON ae.agent_id=ut.id WHERE ut.id='$userId' or ut.responsable_id='$userId'
 
           ;");
         }

@@ -25,15 +25,23 @@ class zoneInterventionService
     public function listeDistrict_ZI()
     {
         // $roleId = auth()->user()->id_roles;
-
-        $res = DB::select("SELECT distinct ta.district_id,di.libelle AS libelle_district,di.*
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
+        if ($roleId == 7) {
+            $res = DB::select("SELECT distinct ta.district_id,di.libelle AS libelle_district,di.*
 FROM tb_zone_interventions ta,
 tb_districts di
 WHERE ta.district_id=di.id
           ;");
-        return $res;
-
-
+            return $res;
+        } else {
+            $res = DB::select("SELECT distinct ta.district_id,di.libelle AS libelle_district,di.*
+FROM tb_zone_interventions ta,
+tb_districts di
+WHERE ta.district_id=di.id AND di.user_id='$userId'
+          ;");
+            return $res;
+        }
     }
     public function listeAireSanitaire_zi()
     {
