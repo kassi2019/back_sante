@@ -31,7 +31,7 @@ class aireSanitaireService
          $roleId = auth()->user()->id_roles;
         $userId = auth()->user()->id;
 
-        if ($roleId == 7) {
+
             $res = DB::select("SELECT distinct ta.district_id,di.libelle AS libelle_district,di.*
 FROM tb_aire_sanitaires ta,
 tb_districts di
@@ -39,17 +39,6 @@ WHERE ta.district_id=di.id
 
           ;");
             return $res;
-        } else {
-            $res = DB::select("SELECT distinct ta.district_id,di.libelle AS libelle_district,di.*
-FROM tb_aire_sanitaires ta,
-tb_districts di
-WHERE ta.district_id=di.id and  di.user_id='$userId'
-          ;");
-            return $res;
-        }
-
-
-
     }
     public function listezoneResponsable($responsale)
     {

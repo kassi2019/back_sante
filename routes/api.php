@@ -19,6 +19,7 @@ use App\Http\Controllers\EquipementController;
 use App\Http\Controllers\typeEquipementController;
 use App\Http\Controllers\inventaireEquipementController;
 use App\Http\Controllers\affectationEquipementController;
+use App\Http\Controllers\stockDistrictController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -173,7 +174,7 @@ Route::get('/equipement', [EquipementController::class, 'index'])->middleware('a
 Route::post('equipement', [EquipementController::class, 'store'])->middleware('auth:api');
 Route::put('/equipement/{id}', [EquipementController::class, 'update'])->middleware('auth:api');
 Route::delete('/equipement/{id}', [EquipementController::class, 'destroy'])->middleware('auth:api');
-Route::get('/afficheTypeEquipement', [EquipementController::class,'afficheTypeEquipement'])->middleware('auth:api');
+Route::get('/afficheTypeEquipement', [EquipementController::class, 'afficheTypeEquipement'])->middleware('auth:api');
 Route::put('/updateRenouvellement/{id}', [EquipementController::class, 'updateRenouvellement'])->middleware('auth:api');
 Route::get('/listeGroupeEquipementOpt', [EquipementController::class, 'listeGroupeEquipementOpt'])->middleware('auth:api');
 //route type equipement
@@ -213,3 +214,17 @@ Route::put('/updateHistoAffectationEquipement/{id}', [affectationEquipementContr
 
 Route::post('verificationStockParAgent', [affectationEquipementController::class, 'verificationStockParAgent'])->middleware('auth:api');
 Route::post('AnnulationStockParAgent', [affectationEquipementController::class, 'AnnulationStockParAgent'])->middleware('auth:api');
+
+
+
+
+// route stock district
+
+Route::get('/afficheEquipementParTypeEquipement/{id}', [stockDistrictController::class, 'afficheEquipementParTypeEquipement'])->middleware('auth:api');
+Route::post('enregistrementStockDistrict', [stockDistrictController::class, 'store'])->middleware('auth:api');
+Route::get('/listeTypeEquipementDansStockDistrict', [stockDistrictController::class, 'listeTypeEquipementDansStockDistrict'])->middleware('auth:api');
+
+Route::get('/listeStockDistrict', [stockDistrictController::class, 'listeStockDistrict'])->middleware('auth:api');
+
+Route::put('/updateStockDistrict/{id}', [stockDistrictController::class, 'update'])->middleware('auth:api');
+Route::delete('/supprimerStockDistrict/{id}', [stockDistrictController::class, 'destroy'])->middleware('auth:api');

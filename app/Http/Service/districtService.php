@@ -21,19 +21,12 @@ class districtService
     {
         $userId = auth()->user()->id;
         $roleId = auth()->user()->id_roles;
-        if ($roleId == 7) {
-            $res = DB::select("SELECT *
-FROM tb_districts
 
-          ;");
-            return $res;
-        }else{
             $res = DB::select("SELECT *
-FROM tb_districts
-WHERE user_id='$userId'
+            FROM tb_districts
           ;");
             return $res;
-        }
+
 
     }
     public function affectationdistrict($responsale)
