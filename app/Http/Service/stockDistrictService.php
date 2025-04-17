@@ -66,7 +66,21 @@ class stockDistrictService
         return $res;
     }
 
-
+    public function listeSuperviseurParDistrict()
+    {
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
+        if ($roleId == 7) {
+            $res = DB::select("SELECT CONCAT(noms, ' ' ,prenoms) AS nom_prenoms,id AS id_ustilisateur FROM users
+                                        WHERE respo_superieur_id is null and responsable_id is not null
+          ;");
+        } else {
+            $res = DB::select("SELECT CONCAT(noms, ' ' ,prenoms) AS nom_prenoms,id AS id_ustilisateur FROM users
+                                        WHERE responsable_id =' $userId'
+          ;");
+        }
+        return $res;
+    }
 
     public function enregistrerStockDistrict(array $data)
     {
@@ -87,7 +101,7 @@ class stockDistrictService
     // Méthode pour modifier un produit
     public function updatestockDistrict($id, array $data)
     {
-   
+
         // Trouver le produit à mettre à jour
         $equipe = stockDistrict::find($id);
 
@@ -134,5 +148,48 @@ class stockDistrictService
 
 
 
+    public function listeEquipementDuDistrictParType($type)
+    {
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
+        if ($roleId == 7) {
+            $res = DB::select("SELECT sd.*,te.libelle,te.code,te.unite_comptage
+             FROM tb_stock_districts sd
+                INNER JOIN tb_equipements te ON te.id=sd.equipement_id
+                WHERE sd.quantite!=0 and sd.type_equipement_id='$type'
 
+
+          ;");
+        } else {
+            $res = DB::select("SELECT sd.*,te.libelle,te.code,te.unite_comptage
+             FROM tb_stock_districts sd
+            INNER JOIN tb_equipements te ON te.id=sd.equipement_id
+            WHERE sd.quantite!=0 AND sd.user_id='$userId' and sd.type_equipement_id='$type'
+          ;");
+        }
+
+        return $res;
+    }
+
+
+    public function listeEquipementDesSuperviseur()
+    {
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
+        if ($roleId == 7) {
+            $res = DB::select("SELECT sup.*,eq.libelle FROM tb_stock_superviseurs sup
+INNER JOIN tb_equipements eq ON sup.equipement_id=eq.id
+
+
+
+          ;");
+        } else {
+            $res = DB::select("SELECT sup.*,eq.libelle FROM tb_stock_superviseurs sup
+INNER JOIN tb_equipements eq ON sup.equipement_id=eq.id
+WHERE sup.user_id=' $userId '
+          ;");
+        }
+
+        return $res;
+    }
 }
