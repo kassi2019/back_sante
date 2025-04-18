@@ -48,12 +48,6 @@ class stockDistrictService
             $res = DB::select("SELECT tp.code,tp.unite_comptage,tp.libelle,sd.*
                                     FROM tb_stock_districts sd
                                     INNER JOIN tb_equipements tp ON tp.id=sd.equipement_id
-
-
-
-
-
-
           ;");
         } else {
             $res = DB::select("SELECT tp.code,tp.unite_comptage,tp.libelle,sd.*
@@ -74,9 +68,13 @@ class stockDistrictService
             $res = DB::select("SELECT CONCAT(noms, ' ' ,prenoms) AS nom_prenoms,id AS id_ustilisateur FROM users
                                         WHERE respo_superieur_id is null and responsable_id is not null
           ;");
-        } else {
+        } else if($roleId == 10) {
             $res = DB::select("SELECT CONCAT(noms, ' ' ,prenoms) AS nom_prenoms,id AS id_ustilisateur FROM users
                                         WHERE responsable_id =' $userId'
+          ;");
+        }else{
+            $res = DB::select("SELECT CONCAT(noms, ' ' ,prenoms) AS nom_prenoms,id AS id_ustilisateur FROM users
+                                        WHERE id =' $userId'
           ;");
         }
         return $res;
@@ -177,16 +175,51 @@ class stockDistrictService
         $userId = auth()->user()->id;
         $roleId = auth()->user()->id_roles;
         if ($roleId == 7) {
-            $res = DB::select("SELECT sup.*,eq.libelle FROM tb_stock_superviseurs sup
+            $res = DB::select("SELECT sup.*,eq.libelle,CONCAT(us.noms,' ',us.prenoms) AS nom_superviseur FROM tb_stock_superviseurs sup
 INNER JOIN tb_equipements eq ON sup.equipement_id=eq.id
+INNER JOIN users us ON sup.superviseur_id=us.id
 
 
 
           ;");
-        } else {
-            $res = DB::select("SELECT sup.*,eq.libelle FROM tb_stock_superviseurs sup
+        } else if ($roleId == 10) {
+            $res = DB::select("SELECT sup.*,eq.libelle,eq.code,eq.unite_comptage,CONCAT(us.noms,' ',us.prenoms) AS nom_superviseur FROM tb_stock_superviseurs sup
 INNER JOIN tb_equipements eq ON sup.equipement_id=eq.id
+INNER JOIN users us ON sup.superviseur_id=us.id
 WHERE sup.user_id=' $userId '
+          ;");
+        } else {
+            $res = DB::select("SELECT sup.*,eq.libelle,eq.code,eq.unite_comptage,eq.code,eq.unite_comptage,CONCAT(us.noms,' ',us.prenoms) AS nom_superviseur FROM tb_stock_superviseurs sup
+INNER JOIN tb_equipements eq ON sup.equipement_id=eq.id
+INNER JOIN users us ON sup.superviseur_id=us.id
+WHERE sup.superviseur_id=' $userId '
+          ;");
+        }
+
+        return $res;
+    }
+
+
+
+
+    public function listeTypeEquipementStockSuperviseur()
+    {
+        $userId = auth()->user()->id;
+        $roleId = auth()->user()->id_roles;
+        if ($roleId == 7) {
+            $res = DB::select("SELECT sd.type_equipement_id,tp.libelle AS libelle_type_equipement,sd.superviseur_id
+FROM tb_stock_superviseurs sd
+INNER JOIN tb_type_equipements tp ON tp.id=sd.type_equipement_id
+GROUP BY sd.type_equipement_id,tp.libelle,sd.superviseur_id
+
+
+          ;");
+        } else {
+            $res = DB::select("SELECT sd.type_equipement_id,tp.libelle AS libelle_type_equipement,sd.superviseur_id
+FROM tb_stock_superviseurs sd
+INNER JOIN tb_type_equipements tp ON tp.id=sd.type_equipement_id
+WHERE sd.user_id='$userId' OR sd.superviseur_id='$userId'
+GROUP BY sd.type_equipement_id,tp.libelle,sd.superviseur_id
           ;");
         }
 
