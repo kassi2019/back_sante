@@ -139,8 +139,66 @@ class stockDistrictController extends Controller
             'numerolot' => 'required|string',
             'quantite' => 'required|integer',
         ]);
-
+if($request->valeur=1){
         try {
+            $userId = auth()->id();
+            $heure_creation = Carbon::now();
+
+            // Recherche de l'équipement dans le stock du district
+            $historique1 = stockDistrict::where('equipement_id', $request->equipement_id)
+                ->where('user_id', $userId)
+                ->where('numerolot', $request->numerolot)
+                ->first();
+            $historique2 = stockSuperviseur::where('equipement_id', $request->equipement_id)
+                ->where('user_id', $userId)
+                ->where('numerolot', $request->numerolot)
+                ->first();
+            // if (!$historique1) {
+            //     return response()->json([
+            //         'message' => 'Stock introuvable pour cet équipement et ce lot.'
+            //     ], 404);
+            // }
+
+            // if ($request->quantite > $historique2->quantite) {
+            //     return response()->json([
+            //         'message' => 'Quantité demandée supérieure à la quantité disponible en stock.'
+            //     ], 400);
+            // }
+
+                $sommeQteUtilise = $historique2->quantite - $request->quantite;
+                // Création de l'enregistrement dans stockSuperviseur
+                $historique2->update([
+                            'type_equipement_id' => $request->type_equipement_id,
+                            'equipement_id' => $request->equipement_id,
+                            //'superviseur_id' => $userId, // à vérifier : c’est bien le district_id ?
+                            'numerolot' => $request->numerolot,
+                            'quantite' => $sommeQteUtilise,
+                            'date_expiration' => $request->date_expiration,
+                            'heure_creation' => $heure_creation,
+                            'user_id' => $userId,
+                            'quantite_initial' => $sommeQteUtilise,
+                        ]);
+
+
+
+            // Mise à jour du stock dans stockDistrict
+            $historique1->update([
+                'quantite' => $historique1->quantite + $request->quantite,
+            ]);
+
+            return response()->json([
+                'message' => 'Équipement approvisionné avec succès.',
+                'equipement' => $historique2
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de l\'approvisionnement.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+}else{
+     try {
             $userId = auth()->id();
             $heure_creation = Carbon::now();
 
@@ -178,14 +236,14 @@ class stockDistrictController extends Controller
                     'quantite_initial' => $request->quantite,
                 ]);
             } else {
-                $sommeQteUtilise = $historique2->quantite + $request->quantite;
+                $sommeQteUtilise = $historique2->quantite - $request->quantite;
                 // Création de l'enregistrement dans stockSuperviseur
                 $equipement = stockSuperviseur::where('equipement_id', $request->equipement_id)
                     ->where('user_id', $userId)
                     ->where('numerolot', $request->numerolot)->update([
                             'type_equipement_id' => $request->type_equipement_id,
                             'equipement_id' => $request->equipement_id,
-                            'superviseur_id' => $userId, // à vérifier : c’est bien le district_id ?
+                            //'superviseur_id' => $userId, // à vérifier : c’est bien le district_id ?
                             'numerolot' => $request->numerolot,
                             'quantite' => $sommeQteUtilise,
                             'date_expiration' => $request->date_expiration,
@@ -198,7 +256,7 @@ class stockDistrictController extends Controller
 
             // Mise à jour du stock dans stockDistrict
             $historique1->update([
-                'quantite' => $historique1->quantite - $request->quantite,
+                'quantite' => $historique1->quantite + $request->quantite,
             ]);
 
             return response()->json([
@@ -212,7 +270,34 @@ class stockDistrictController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+}
+
+
+
+
+
+
     }
 
+
+
+
+
+
+
+
+
+    public function modificationStockSuperviseur(Request $request)
+    {
+        // Validation des données entrantes
+        $request->validate([
+            'type_equipement_id' => 'required|integer',
+            'equipement_id' => 'required|integer',
+            'numerolot' => 'required|string',
+            'quantite' => 'required|integer',
+        ]);
+
+
+    }
 
 }
