@@ -5,6 +5,7 @@ use App\Http\Service\stockDistrictService;
 use Illuminate\Http\Request;
 use App\Models\stockSuperviseur;
 use App\Models\stockDistrict;
+use App\Models\stockAsc;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 class stockDistrictController extends Controller
@@ -50,7 +51,12 @@ class stockDistrictController extends Controller
         $products = $this->stockDistrictService->listeEquipementDesSuperviseur();
         return response()->json($products);
     }
+   public function listeEquipementDesAsc()
+    {
 
+        $products = $this->stockDistrictService->listeEquipementDesAsc();
+        return response()->json($products);
+    }
 
     public function listeEquipementDuDistrictParType($type)
     {
@@ -151,78 +157,34 @@ class stockDistrictController extends Controller
 
         $userId = auth()->id();
         $heure_creation = Carbon::now();
-
-        try {
-            $historiqueDistrict = stockDistrict::where('equipement_id', $request->equipement_id)
-                ->where('user_id', $userId)
-                ->where('numerolot', $request->numerolot)
-                ->first();
-
-            if (!$historiqueDistrict) {
-                return response()->json([
-                    'message' => 'Aucun stock trouvé dans le district pour cet équipement.'
-                ], 404);
-            }
-
-            // Cas 1 : Reprise par superviseur
-            if ($request->valeur == 1) {
-                $historiqueSuperviseur = stockSuperviseur::where('equipement_id', $request->equipement_id)
+        $roleId = auth()->user()->id_roles;
+        if($roleId==10){
+            try {
+                $historiqueDistrict = stockDistrict::where('equipement_id', $request->equipement_id)
                     ->where('user_id', $userId)
                     ->where('numerolot', $request->numerolot)
                     ->first();
 
-                if (!$historiqueSuperviseur) {
+                if (!$historiqueDistrict) {
                     return response()->json([
-                        'message' => 'Stock superviseur introuvable.'
+                        'message' => 'Aucun stock trouvé dans le district pour cet équipement.'
                     ], 404);
                 }
 
-                $nouvelleQuantite = $historiqueSuperviseur->quantite - $request->quantite;
+                // Cas 1 : Reprise par superviseur
+                if ($request->valeur == 1) {
+                    $historiqueSuperviseur = stockSuperviseur::where('equipement_id', $request->equipement_id)
+                        ->where('user_id', $userId)->where('superviseur_id', $request->superviseur_id)
+                        ->where('numerolot', $request->numerolot)
+                        ->first();
 
-                $historiqueSuperviseur->update([
-                    'type_equipement_id' => $request->type_equipement_id,
-                    'quantite' => $nouvelleQuantite,
-                    'date_expiration' => $request->date_expiration,
-                    'heure_creation' => $heure_creation,
-                    'quantite_initial' => $nouvelleQuantite,
-                ]);
+                    if (!$historiqueSuperviseur) {
+                        return response()->json([
+                            'message' => 'Stock superviseur introuvable.'
+                        ], 404);
+                    }
 
-                $historiqueDistrict->update([
-                    'quantite' => $historiqueDistrict->quantite + $request->quantite,
-                ]);
-
-                return response()->json([
-                    'message' => 'Équipement repris du superviseur vers le district avec succès.',
-                    'equipement' => $historiqueSuperviseur
-                ], 201);
-
-            } else {
-                // Cas 2 : Distribution vers superviseur
-                if ($request->quantite > $historiqueDistrict->quantite) {
-                    return response()->json([
-                        'message' => 'Quantité demandée supérieure à la quantité disponible en stock district.'
-                    ], 400);
-                }
-
-                $historiqueSuperviseur = stockSuperviseur::where('equipement_id', $request->equipement_id)
-                    ->where('superviseur_id', $request->superviseur_id)
-                    ->where('numerolot', $request->numerolot)
-                    ->first();
-
-                if (!$historiqueSuperviseur) {
-                    $equipement = stockSuperviseur::create([
-                        'type_equipement_id' => $request->type_equipement_id,
-                        'equipement_id' => $request->equipement_id,
-                        'numerolot' => $request->numerolot,
-                        'quantite' => $request->quantite,
-                        'date_expiration' => $request->date_expiration,
-                        'heure_creation' => $heure_creation,
-                        'superviseur_id' => $request->superviseur_id,
-                        'user_id' => $userId,
-                        'quantite_initial' => $request->quantite,
-                    ]);
-                } else {
-                    $nouvelleQuantite = $historiqueSuperviseur->quantite + $request->quantite;
+                    $nouvelleQuantite = $historiqueSuperviseur->quantite - $request->quantite;
 
                     $historiqueSuperviseur->update([
                         'type_equipement_id' => $request->type_equipement_id,
@@ -232,69 +194,267 @@ class stockDistrictController extends Controller
                         'quantite_initial' => $nouvelleQuantite,
                     ]);
 
-                    $equipement = $historiqueSuperviseur;
+                    $historiqueDistrict->update([
+                        'quantite' => $historiqueDistrict->quantite + $request->quantite,
+                    ]);
+
+                    return response()->json([
+                        'message' => 'Équipement repris du superviseur vers le district avec succès.',
+                        'equipement' => $historiqueSuperviseur
+                    ], 201);
+
+                } else {
+                    // Cas 2 : Distribution vers superviseur
+                    if ($request->quantite > $historiqueDistrict->quantite) {
+                        return response()->json([
+                            'message' => 'Quantité demandée supérieure à la quantité disponible en stock district.'
+                        ], 400);
+                    }
+
+                    $historiqueSuperviseur = stockSuperviseur::where('equipement_id', $request->equipement_id)
+                        ->where('superviseur_id', $request->superviseur_id)
+                        ->where('numerolot', $request->numerolot)
+                        ->first();
+
+                    if (!$historiqueSuperviseur) {
+                        $equipement = stockSuperviseur::create([
+                            'type_equipement_id' => $request->type_equipement_id,
+                            'equipement_id' => $request->equipement_id,
+                            'numerolot' => $request->numerolot,
+                            'quantite' => $request->quantite,
+                            'date_expiration' => $request->date_expiration,
+                            'heure_creation' => $heure_creation,
+                            'superviseur_id' => $request->superviseur_id,
+                            'user_id' => $userId,
+                            'quantite_initial' => $request->quantite,
+                        ]);
+                    } else {
+                        $nouvelleQuantite = $historiqueSuperviseur->quantite + $request->quantite;
+
+                        $historiqueSuperviseur->update([
+                            'type_equipement_id' => $request->type_equipement_id,
+                            'quantite' => $nouvelleQuantite,
+                            'date_expiration' => $request->date_expiration,
+                            'heure_creation' => $heure_creation,
+                            'quantite_initial' => $nouvelleQuantite,
+                        ]);
+
+                        $equipement = $historiqueSuperviseur;
+                    }
+
+                    // Mise à jour du stock du district
+                    $historiqueDistrict->update([
+                        'quantite' => $historiqueDistrict->quantite - $request->quantite,
+                    ]);
+
+                    return response()->json([
+                        'message' => 'Équipement transféré au superviseur avec succès.',
+                        'equipement' => $equipement
+                    ], 201);
                 }
 
-                // Mise à jour du stock du district
-                $historiqueDistrict->update([
-                    'quantite' => $historiqueDistrict->quantite - $request->quantite,
-                ]);
-
+            } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Équipement transféré au superviseur avec succès.',
-                    'equipement' => $equipement
-                ], 201);
+                    'message' => 'Une erreur est survenue lors du traitement.',
+                    'error' => $e->getMessage()
+                ], 500);
             }
+        }else{
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Une erreur est survenue lors du traitement.',
-                'error' => $e->getMessage()
-            ], 500);
+            try {
+                $historiqueDistrict = stockSuperviseur::where('equipement_id', $request->equipement_id)
+                    ->where('superviseur_id', $userId)
+                    ->where('numerolot', $request->numerolot)
+                    ->first();
+
+                if (!$historiqueDistrict) {
+                    return response()->json([
+                        'message' => 'Aucun stock trouvé dans chez le superviseur pour cet équipement.'
+                    ], 404);
+                }
+
+                // Cas 1 : Reprise par superviseur
+                if ($request->valeur == 1) {
+                    $historiqueSuperviseur = stockAsc::where('equipement_id', $request->equipement_id)
+                        ->where('user_id', $userId)
+                        ->where('asc_id', $request->asc_id)
+                        ->where('numerolot', $request->numerolot)
+                        ->first();
+
+                    if (!$historiqueSuperviseur) {
+                        return response()->json([
+                            'message' => 'Stock ASC introuvable.'
+                        ], 404);
+                    }
+
+                    $nouvelleQuantite = $historiqueSuperviseur->quantite - $request->quantite;
+
+                    $historiqueSuperviseur->update([
+                        'type_equipement_id' => $request->type_equipement_id,
+                        'quantite' => $nouvelleQuantite,
+                        'date_expiration' => $request->date_expiration,
+                        'heure_creation' => $heure_creation,
+                        'quantite_initial' => $nouvelleQuantite,
+                    ]);
+
+                    $historiqueDistrict->update([
+                        'quantite' => $historiqueDistrict->quantite + $request->quantite,
+                    ]);
+
+                    return response()->json([
+                        'message' => 'Équipement repris du superviseur vers le district avec succès.',
+                        'equipement' => $historiqueSuperviseur
+                    ], 201);
+
+                } else {
+                    // Cas 2 : Distribution vers superviseur
+                    if ($request->quantite > $historiqueDistrict->quantite) {
+                        return response()->json([
+                            'message' => 'Quantité demandée supérieure à la quantité disponible en stock du superviseur.'
+                        ], 400);
+                    }
+
+                    $historiqueSuperviseur = stockAsc::where('equipement_id', $request->equipement_id)
+                        ->where('asc_id', $request->asc_id)
+                        ->where('numerolot', $request->numerolot)
+                        ->first();
+
+                    if (!$historiqueSuperviseur) {
+                        $equipement = stockAsc::create([
+                            'type_equipement_id' => $request->type_equipement_id,
+                            'equipement_id' => $request->equipement_id,
+                            'numerolot' => $request->numerolot,
+                            'quantite' => $request->quantite,
+                            'date_expiration' => $request->date_expiration,
+                            'heure_creation' => $heure_creation,
+                            'asc_id' => $request->asc_id,
+                            'user_id' => $userId,
+                            'quantite_initial' => $request->quantite,
+
+                        ]);
+                    } else {
+                        $nouvelleQuantite = $historiqueSuperviseur->quantite + $request->quantite;
+
+                        $historiqueSuperviseur->update([
+                            'type_equipement_id' => $request->type_equipement_id,
+                            'quantite' => $nouvelleQuantite,
+                            'date_expiration' => $request->date_expiration,
+                            'heure_creation' => $heure_creation,
+                            'quantite_initial' => $nouvelleQuantite,
+                        ]);
+
+                        $equipement = $historiqueSuperviseur;
+                    }
+
+                    // Mise à jour du stock du district
+                    $historiqueDistrict->update([
+                        'quantite' => $historiqueDistrict->quantite - $request->quantite,
+                    ]);
+
+                    return response()->json([
+                        'message' => 'Équipement transféré au ASC avec succès.',
+                        'equipement' => $equipement
+                    ], 201);
+                }
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Une erreur est survenue lors du traitement.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
         }
+
+
+
+
+
     }
 
 
     public function supprimerEquipementSup($id)
     {
-        try {
-            $userId = auth()->id();
+        $roleId = auth()->user()->id_roles;
+        if($roleId==10){
+            try {
+                $userId = auth()->id();
 
-            // Récupération de l'enregistrement dans stockSuperviseur
-            $equipementSup = stockSuperviseur::find($id);
+                // Récupération de l'enregistrement dans stockSuperviseur
+                $equipementSup = stockSuperviseur::find($id);
 
-            if (!$equipementSup) {
-                return response()->json(['message' => 'Équipement superviseur introuvable.'], 404);
+                if (!$equipementSup) {
+                    return response()->json(['message' => 'Équipement superviseur introuvable.'], 404);
+                }
+
+                // Récupération de l'enregistrement correspondant dans stockDistrict
+                $equipementDistrict = stockDistrict::where('equipement_id', $equipementSup->equipement_id)
+                    ->where('user_id', $userId)
+                    ->where('numerolot', $equipementSup->numerolot)
+                    ->first();
+
+                if (!$equipementDistrict) {
+                    return response()->json(['message' => 'Équipement district introuvable.'], 404);
+                }
+
+                // Mise à jour de la quantité
+                $nouvelleQuantite = $equipementSup->quantite + $equipementDistrict->quantite;
+
+                $equipementDistrict->update([
+                    'quantite' => $nouvelleQuantite,
+                ]);
+
+                // Suppression de l'enregistrement superviseur
+                $equipementSup->delete();
+
+                return response()->json(['message' => 'Supprimé avec succès !'], 200);
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Une erreur est survenue.',
+                    'error' => $e->getMessage()
+                ], 500);
             }
+        }else{
+            try {
+                $userId = auth()->id();
 
-            // Récupération de l'enregistrement correspondant dans stockDistrict
-            $equipementDistrict = stockDistrict::where('equipement_id', $equipementSup->equipement_id)
-                ->where('user_id', $userId)
-                ->where('numerolot', $equipementSup->numerolot)
-                ->first();
+                // Récupération de l'enregistrement dans stockSuperviseur
+                $equipementSup = stockAsc::find($id);
 
-            if (!$equipementDistrict) {
-                return response()->json(['message' => 'Équipement district introuvable.'], 404);
+                if (!$equipementSup) {
+                    return response()->json(['message' => 'Équipement ASc introuvable.'], 404);
+                }
+
+                // Récupération de l'enregistrement correspondant dans stockDistrict
+                $equipementDistrict = stockSuperviseur::where('equipement_id', $equipementSup->equipement_id)
+                    ->where('user_id', $userId)
+                    ->where('numerolot', $equipementSup->numerolot)
+                    ->first();
+
+                if (!$equipementDistrict) {
+                    return response()->json(['message' => 'Équipement district introuvable.'], 404);
+                }
+
+                // Mise à jour de la quantité
+                $nouvelleQuantite = $equipementSup->quantite + $equipementDistrict->quantite;
+
+                $equipementDistrict->update([
+                    'quantite' => $nouvelleQuantite,
+                ]);
+
+                // Suppression de l'enregistrement superviseur
+                $equipementSup->delete();
+
+                return response()->json(['message' => 'Supprimé avec succès !'], 200);
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Une erreur est survenue.',
+                    'error' => $e->getMessage()
+                ], 500);
             }
-
-            // Mise à jour de la quantité
-            $nouvelleQuantite = $equipementSup->quantite + $equipementDistrict->quantite;
-
-            $equipementDistrict->update([
-                'quantite' => $nouvelleQuantite,
-            ]);
-
-            // Suppression de l'enregistrement superviseur
-            $equipementSup->delete();
-
-            return response()->json(['message' => 'Supprimé avec succès !'], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Une erreur est survenue.',
-                'error' => $e->getMessage()
-            ], 500);
         }
+
     }
 
 }

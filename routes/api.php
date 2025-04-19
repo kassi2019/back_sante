@@ -236,3 +236,6 @@ Route::post('enregistrementStockSuperviseur', [stockDistrictController::class, '
 Route::get('/equipementDesSuperviseur', [stockDistrictController::class, 'listeEquipementDesSuperviseur'])->middleware('auth:api');
 Route::delete('/supprimerEquipementSup/{id}', [stockDistrictController::class, 'supprimerEquipementSup'])->middleware('auth:api');
 Route::get('/listeTypeEquipementStockSuperviseur', [stockDistrictController::class, 'listeTypeEquipementStockSuperviseur'])->middleware('auth:api');
+
+
+Route::get('/listeEquipementDesAsc', [stockDistrictController::class, 'listeEquipementDesAsc'])->middleware('auth:api');
