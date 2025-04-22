@@ -42,23 +42,19 @@ where eq.agent_id='$userId' or eq.superviseur_id='$userId'
         $roleid = auth()->user()->id_roles;
         $userId = auth()->user()->id;
         if ($roleid == 7) {
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup,eq.numerolot,eq.date_expiration
-FROM tb_affectation_equipements eq
+            $res = DB::select("SELECT te.libelle as libelle_equipement,eq.*
+FROM tb_stock_asc eq
 inner join tb_equipements te on te.id=eq.equipement_id
-inner join users us on us.id=eq.agent_id
+inner join users us on us.id=eq.asc_id
 
-
-group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id
           ;");
         }else{
-            $res = DB::select("SELECT eq.agent_id,te.libelle as libelle_equipement,eq.quantite_affecte,eq.id as id_table,eq.status,eq.quantite_utilise,eq.equipement_id,eq.mouvement,eq.quantite_saisir,eq.qte_recu_sup,eq.numerolot,eq.date_expiration,eq.superviseur_id
-FROM tb_affectation_equipements eq
+            $res = DB::select("SELECT te.libelle as libelle_equipement,eq.*
+FROM tb_stock_asc eq
 inner join tb_equipements te on te.id=eq.equipement_id
-inner join users us on us.id=eq.agent_id
+inner join users us on us.id=eq.asc_id
 
-where eq.agent_id='$userId' or eq.superviseur_id='$userId'
-
-group by eq.agent_id,te.libelle,eq.quantite_affecte,eq.id,eq.status,eq.quantite_utilise,eq.equipement_id,eq.superviseur_id
+WHERE eq.asc_id='$userId' OR eq.user_id='$userId'
           ;");
         }
         return $res;
